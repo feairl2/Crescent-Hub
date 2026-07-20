@@ -4,6 +4,7 @@ local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local PathfindingService = game:GetService("PathfindingService")
 
 local ESP_Enabled = false
 local ESP_ShowRoles = false
@@ -12,18 +13,20 @@ local ESP_ShowGun = false
 local ChamsContainer = {}
 local GunESPContainer = {}
 local Noclip_Enabled = false
+local localPlayer_Noclip_Active = false
 
 local Fly_Enabled = false
 local FlySpeed = 30
-local Fly_BodyVelocity = nil
-local Fly_BodyGyro = nil
+local FlyConnection = nil
+local flyVelocity = Vector3.new(0, 0, 0)
 
 local AutoFarm_Enabled = false
 local FarmSpeed = 30
 local KillAll_Enabled = false
 local AutoGrabGun_Enabled = false
 
-local AutoDodgeKnife_Enabled = false
+local AutoDodgeMurderer_Enabled = false
+local isDodgeActive = false
 
 local XRay_Enabled = false
 local OriginalTransparency = {}
@@ -43,7 +46,18 @@ local Window = WindUI:CreateWindow({
     SideBarWidth = 200,
 })
 
-local function ClearAllNameTags()
+local function ClearPlayerESP(playerName)
+    if ChamsContainer[playerName] then
+        pcall(function() ChamsContainer[playerName]:Destroy() end)
+        ChamsContainer[playerName] = nil
+    end
+end
+
+local function ClearAllESP()
+    for name, _ in pairs(ChamsContainer) do
+        ClearPlayerESP(name)
+    end
+    table.clear(ChamsContainer)
     for _, p in pairs(Players:GetPlayers()) do
         if p.Character then
             local head = p.Character:FindFirstChild("Head")
@@ -158,10 +172,10 @@ CombatTab:Button({
 CombatTab:Section({ Title = "Survival & Evasion" })
 
 CombatTab:Toggle({
-    Title = "Auto Dodge Thrown Knife (Ultra Precise)",
-    Desc = "Smartly detects flying knife projectiles with zero false positives.",
+    Title = "Auto Dodge Murderer",
+    Desc = "Uses pathfinding to find a safe node, then teleports to the target.",
     Default = false,
-    Callback = function(Value) AutoDodgeKnife_Enabled = Value end
+    Callback = function(Value) AutoDodgeMurderer_Enabled = Value end
 })
 
 local TrollTab = Window:Tab({
@@ -199,8 +213,8 @@ TrollTab:Toggle({
 TrollTab:Section({ Title = "Fling Controls" })
 
 TrollTab:Button({
-    Title = "Fling Murderer / Sheriff",
-    Desc = "Attach to murderer or sheriff, spin wildly for 10s, then restore back to original position.",
+    Title = "Fling Murderer",
+    Desc = "Attach to murderer, spin wildly for 10s, then restore back to original position.",
     Callback = function()
         if IsFlinging then return end
         local lp = Players.LocalPlayer
@@ -212,18 +226,15 @@ TrollTab:Button({
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= lp and p.Character then
                 local hasKnife = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
-                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-                if hasKnife or hasGun then
-                    if p.Character:FindFirstChild("HumanoidRootPart") then
-                        target = p.Character.HumanoidRootPart
-                        break
-                    end
+                if hasKnife and p.Character:FindFirstChild("HumanoidRootPart") then
+                    target = p.Character.HumanoidRootPart
+                    break
                 end
             end
         end
         
         if not target then
-            WindUI:Notify({ Title = "Troll Fling", Content = "No Murderer or Sheriff found!", Duration = 2 })
+            WindUI:Notify({ Title = "Troll Fling", Content = "No Murderer found!", Duration = 2 })
             return
         end
         
@@ -258,7 +269,69 @@ TrollTab:Button({
             end
             
             IsFlinging = false
-            WindUI:Notify({ Title = "Troll Fling", Content = "Fling completed and returned to original position!", Duration = 2 })
+            WindUI:Notify({ Title = "Troll Fling", Content = "Fling Murderer completed and returned!", Duration = 2 })
+        end)
+    end
+})
+
+TrollTab:Button({
+    Title = "Fling Sheriff",
+    Desc = "Attach to sheriff, spin wildly for 10s, then restore back to original position.",
+    Callback = function()
+        if IsFlinging then return end
+        local lp = Players.LocalPlayer
+        local char = lp.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        
+        local target = nil
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= lp and p.Character then
+                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
+                if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
+                    target = p.Character.HumanoidRootPart
+                    break
+                end
+            end
+        end
+        
+        if not target then
+            WindUI:Notify({ Title = "Troll Fling", Content = "No Sheriff found!", Duration = 2 })
+            return
+        end
+        
+        IsFlinging = true
+        OriginalCFrame = root.CFrame
+        
+        local bav = Instance.new("BodyAngularVelocity")
+        bav.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bav.AngularVelocity = Vector3.new(0, 99999, 0)
+        bav.Parent = root
+        
+        local startTime = tick()
+        local connection
+        connection = RunService.Heartbeat:Connect(function()
+            if target and target.Parent and root and (tick() - startTime < 10) then
+                localPlayer_Noclip_Active = true
+                root.CFrame = target.CFrame * CFrame.new(math.random(-2, 2), math.random(-2, 2), math.random(-2, 2)) * CFrame.Angles(math.random(0, 360), math.random(0, 360), math.random(0, 360))
+            else
+                if connection then connection:Disconnect() end
+            end
+        end)
+        
+        task.delay(10, function()
+            if connection then connection:Disconnect() end
+            if bav then bav:Destroy() end
+            localPlayer_Noclip_Active = false
+            
+            if root and OriginalCFrame then
+                root.CFrame = OriginalCFrame
+                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+            end
+            
+            IsFlinging = false
+            WindUI:Notify({ Title = "Troll Fling", Content = "Fling Sheriff completed and returned!", Duration = 2 })
         end)
     end
 })
@@ -295,31 +368,53 @@ PlayerTab:Slider({
 
 PlayerTab:Toggle({
     Title = "Enable Fly",
-    Desc = "Toggle 3D camera-relative flight.",
+    Desc = "Toggle stable non-dropping 3D flight.",
     Default = false,
     Callback = function(Value)
         Fly_Enabled = Value
         local lp = Players.LocalPlayer
         local char = lp.Character
+        local hum = char and char:FindFirstChild("Humanoid")
         local root = char and char:FindFirstChild("HumanoidRootPart")
         
         if not Value then
-            if Fly_BodyVelocity then Fly_BodyVelocity:Destroy() Fly_BodyVelocity = nil end
-            if Fly_BodyGyro then Fly_BodyGyro:Destroy() Fly_BodyGyro = nil end
-            if char and char:FindFirstChild("Humanoid") then char.Humanoid.PlatformStand = false end
+            if FlyConnection then
+                FlyConnection:Disconnect()
+                FlyConnection = nil
+            end
+            if hum then hum.PlatformStand = false end
+            flyVelocity = Vector3.new(0, 0, 0)
         else
-            if root and char and char:FindFirstChild("Humanoid") then
-                char.Humanoid.PlatformStand = true
-                Fly_BodyGyro = Instance.new("BodyGyro")
-                Fly_BodyGyro.P = 9e4
-                Fly_BodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-                Fly_BodyGyro.cframe = root.CFrame
-                Fly_BodyGyro.Parent = root
+            if hum and root then
+                hum.PlatformStand = true
+                flyVelocity = Vector3.new(0, 0, 0)
                 
-                Fly_BodyVelocity = Instance.new("BodyVelocity")
-                Fly_BodyVelocity.velocity = Vector3.new(0, 0, 0)
-                Fly_BodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
-                Fly_BodyVelocity.Parent = root
+                if FlyConnection then FlyConnection:Disconnect() end
+                
+                FlyConnection = RunService.RenderStepped:Connect(function(dt)
+                    if not Fly_Enabled or not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
+                        if FlyConnection then FlyConnection:Disconnect() end
+                        return
+                    end
+                    
+                    local currentRoot = lp.Character.HumanoidRootPart
+                    local camera = workspace.CurrentCamera
+                    
+                    local moveDir = Vector3.new(0, 0, 0)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + camera.CFrame.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - camera.CFrame.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
+                    
+                    local targetVel = moveDir.Magnitude > 0 and moveDir.Unit * FlySpeed or Vector3.new(0, 0, 0)
+                    flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
+                    
+                    currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
+                    currentRoot.CFrame = CFrame.new(currentRoot.Position, currentRoot.Position + camera.CFrame.LookVector)
+                    
+                    currentRoot.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                    currentRoot.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                end)
             end
         end
     end
@@ -364,7 +459,7 @@ FarmTab:Section({ Title = "Automation" })
 
 FarmTab:Toggle({
     Title = "Auto Grab Gun",
-    Desc = "Instantly teleport and pick up dropped sheriff gun.",
+    Desc = "Instantly teleport, pick up dropped gun, and return to original position.",
     Default = false,
     Callback = function(Value) AutoGrabGun_Enabled = Value end
 })
@@ -388,43 +483,49 @@ TeleportTab:Button({
 })
 
 TeleportTab:Button({
-    Title = "TP to map (Sheriff)",
-    Desc = "Teleport straight to the sheriff holding the gun.",
+    Title = "TP to Murderer",
+    Desc = "Teleport straight to the murderer holding the knife.",
     Callback = function()
         local lp = Players.LocalPlayer
         if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        local foundSheriff = false
+        local foundTarget = false
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= lp and p.Character then
-                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-                if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
-                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 4, 0)
-                    foundSheriff = true
-                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Sheriff!", Duration = 2 })
+                local hasKnife = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
+                if hasKnife and p.Character:FindFirstChild("HumanoidRootPart") then
+                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+                    foundTarget = true
+                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Murderer!", Duration = 2 })
                     break
                 end
             end
         end
-        if not foundSheriff then
-            WindUI:Notify({ Title = "Teleport", Content = "Sheriff not found or gun not taken yet.", Duration = 2 })
+        if not foundTarget then
+            WindUI:Notify({ Title = "Teleport", Content = "No Murderer found yet.", Duration = 2 })
         end
     end
 })
 
 TeleportTab:Button({
-    Title = "Teleport to Sheriff (Gun Holder)",
-    Desc = "Teleport right above the player holding the gun.",
+    Title = "TP to Sheriff",
+    Desc = "Teleport straight to the sheriff holding the gun.",
     Callback = function()
         local lp = Players.LocalPlayer
         if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
+        local foundTarget = false
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= lp and p.Character then
                 local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
                 if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
-                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 4, 0)
+                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+                    foundTarget = true
+                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Sheriff!", Duration = 2 })
                     break
                 end
             end
+        end
+        if not foundTarget then
+            WindUI:Notify({ Title = "Teleport", Content = "No Sheriff found yet.", Duration = 2 })
         end
     end
 })
@@ -458,9 +559,7 @@ ESPTab:Toggle({
     Callback = function(Value)
         ESP_Enabled = Value
         if not Value then
-            for _, folder in pairs(ChamsContainer) do if folder then pcall(function() folder:Destroy() end) end end
-            table.clear(ChamsContainer)
-            ClearAllNameTags()
+            ClearAllESP()
         end
     end
 })
@@ -478,7 +577,7 @@ ESPTab:Toggle({
     Default = false,
     Callback = function(Value)
         ESP_ShowNames = Value
-        if not Value then ClearAllNameTags() end
+        if not Value then ClearAllESP() end
     end
 })
 
@@ -535,7 +634,7 @@ local function GetPlayerRoleColor(player)
 end
 
 local function ApplyChams(player, char)
-    if ChamsContainer[player.Name] then return end
+    ClearPlayerESP(player.Name)
     local folder = Instance.new("Folder", workspace)
     folder.Name = player.Name .. "_ChamsFolder"
     ChamsContainer[player.Name] = folder
@@ -561,6 +660,32 @@ local function FindNearestCoin(playerRoot)
         end)
     end
     return closest
+end
+
+local function getMurderer()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local char = player.Character
+            if char:FindFirstChild("Knife") or (player.Backpack and player.Backpack:FindFirstChild("Knife")) then
+                return player
+            end
+        end
+    end
+    return nil
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(char)
+        task.wait(0.5)
+        ClearPlayerESP(player.Name)
+    end)
+end)
+
+for _, player in ipairs(Players:GetPlayers()) do
+    player.CharacterAdded:Connect(function(char)
+        task.wait(0.5)
+        ClearPlayerESP(player.Name)
+    end)
 end
 
 task.spawn(function()
@@ -599,8 +724,15 @@ task.spawn(function()
                 if not hasGun then
                     for _, v in pairs(workspace:GetDescendants()) do
                         if v:IsA("BasePart") and v.Name == "GunDrop" then
+                            local originalPos = root.CFrame
+                            localPlayer_Noclip_Active = true
                             root.CFrame = v.CFrame * CFrame.new(0, 1, 0)
-                            WindUI:Notify({ Title = "Auto Grab Gun", Content = "Successfully grabbed dropped gun!", Duration = 2 })
+                            task.wait(0.3)
+                            
+                            root.CFrame = originalPos
+                            localPlayer_Noclip_Active = false
+                            
+                            WindUI:Notify({ Title = "Auto Grab Gun", Content = "Successfully grabbed dropped gun and returned!", Duration = 2 })
                             task.wait(1)
                             break
                         end
@@ -680,49 +812,67 @@ task.spawn(function()
     end
 end)
 
-local lastDodgeTick = 0
-
 RunService.Heartbeat:Connect(function()
     local lp = Players.LocalPlayer
-    local camera = workspace.CurrentCamera
     
     if (Noclip_Enabled or localPlayer_Noclip_Active) and lp.Character then
         for _, p in pairs(lp.Character:GetChildren()) do if p:IsA("BasePart") then p.CanCollide = false end end
     end
 
-    if Fly_Enabled and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and Fly_BodyVelocity and Fly_BodyGyro then
+    if AutoDodgeMurderer_Enabled and not isDodgeActive and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
         local root = lp.Character.HumanoidRootPart
-        Fly_BodyGyro.cframe = camera.CFrame
-        local dir = Vector3.new(0,0,0)
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + camera.CFrame.LookVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - camera.CFrame.LookVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - camera.CFrame.RightVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + camera.CFrame.RightVector end
-        Fly_BodyVelocity.velocity = dir.Magnitude > 0 and dir.Unit * FlySpeed or Vector3.new(0,0,0)
-    end
-
-    if AutoDodgeKnife_Enabled and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
-        local root = lp.Character.HumanoidRootPart
-        if tick() - lastDodgeTick > 0.4 then
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj:IsA("BasePart") and obj.Name == "KnifeProjectile" then
-                    local isOwnedByPlayer = false
-                    for _, p in pairs(Players:GetPlayers()) do
-                        if p.Character and obj:IsDescendantOf(p.Character) then
-                            isOwnedByPlayer = true
-                            break
-                        end
-                    end
+        local murderer = getMurderer()
+        
+        if murderer and murderer.Character and murderer.Character:FindFirstChild("HumanoidRootPart") then
+            local murdererHRP = murderer.Character.HumanoidRootPart
+            local distance = (root.Position - murdererHRP.Position).Magnitude
+            
+            if distance <= 45 then
+                isDodgeActive = true
+                
+                local baseEscapeDir = (root.Position - murdererHRP.Position).Unit
+                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180}
+                local bestTargetPos = nil
+                local maxDistFromMurderer = 0
+                
+                local path = PathfindingService:CreatePath({
+                    AgentRadius = 2,
+                    AgentHeight = 5,
+                    AgentCanJump = true
+                })
+                
+                for _, ang in ipairs(angles) do
+                    local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
+                    local candidatePos = root.Position + (rotatedDir * 40)
                     
-                    if not isOwnedByPlayer then
-                        local dist = (root.Position - obj.Position).Magnitude
-                        if dist < 12 then
-                            lastDodgeTick = tick()
-                            root.AssemblyLinearVelocity = root.AssemblyLinearVelocity + Vector3.new(math.random(-12, 12), 12, math.random(12, 20))
-                            break
+                    local success = pcall(function()
+                        path:ComputeAsync(root.Position, candidatePos)
+                    end)
+                    
+                    if success and path.Status == Enum.PathStatus.Success then
+                        local waypoints = path:GetWaypoints()
+                        if waypoints and #waypoints > 0 then
+                            local safeNodePos = waypoints[#waypoints].Position
+                            local distToMurderer = (safeNodePos - murdererHRP.Position).Magnitude
+                            
+                            if distToMurderer > maxDistFromMurderer then
+                                maxDistFromMurderer = distToMurderer
+                                bestTargetPos = safeNodePos
+                            end
                         end
                     end
                 end
+                
+                task.spawn(function()
+                    if bestTargetPos then
+                        root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3, 0))
+                    else
+                        root.CFrame = root.CFrame + (baseEscapeDir * 30) + Vector3.new(0, 4, 0)
+                    end
+                    
+                    task.wait(1.2)
+                    isDodgeActive = false
+                end)
             end
         end
     end
@@ -731,15 +881,24 @@ RunService.Heartbeat:Connect(function()
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= lp then
                 local char = p.Character
-                if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
-                    if not ChamsContainer[p.Name] or not ChamsContainer[p.Name].Parent then ApplyChams(p, char) end
-                    local color = GetPlayerRoleColor(p)
-                    if ChamsContainer[p.Name] then
-                        for _, a in pairs(ChamsContainer[p.Name]:GetChildren()) do if a:IsA("BoxHandleAdornment") then a.Color3 = color end end
+                local isAlive = char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0
+                
+                if isAlive then
+                    if not ChamsContainer[p.Name] or not ChamsContainer[p.Name].Parent then 
+                        ApplyChams(p, char) 
                     end
+                    
+                    local color = GetPlayerRoleColor(p)
+                    
+                    if ChamsContainer[p.Name] then
+                        for _, a in pairs(ChamsContainer[p.Name]:GetChildren()) do 
+                            if a:IsA("BoxHandleAdornment") then a.Color3 = color end 
+                        end
+                    end
+                    
                     local head = char:FindFirstChild("Head")
                     if head then
-                        if ESP_ShowNames then
+                        if ESP_ShowNames or ESP_ShowRoles then
                             local tag = head:FindFirstChild("NameESP")
                             if not tag then
                                 local bb = Instance.new("BillboardGui", head)
@@ -747,14 +906,20 @@ RunService.Heartbeat:Connect(function()
                                 local tl = Instance.new("TextLabel", bb)
                                 tl.Size, tl.BackgroundTransparency, tl.Text, tl.TextColor3, tl.Font, tl.TextSize, tl.TextStrokeTransparency = UDim2.new(1,0,1,0), 1, p.DisplayName or p.Name, color, Enum.Font.SourceSansBold, 16, 0.4
                             else
-                                if tag:FindFirstChild("TextLabel") then tag.TextLabel.TextColor3 = color end
+                                if tag:FindFirstChild("TextLabel") then 
+                                    tag.TextLabel.TextColor3 = color 
+                                    tag.TextLabel.Text = p.DisplayName or p.Name
+                                end
                             end
                         else
                             if head:FindFirstChild("NameESP") then head.NameESP:Destroy() end
                         end
                     end
                 else
-                    if ChamsContainer[p.Name] then pcall(function() ChamsContainer[p.Name]:Destroy() end) ChamsContainer[p.Name] = nil end
+                    ClearPlayerESP(p.Name)
+                    if char and char:FindFirstChild("Head") and char.Head:FindFirstChild("NameESP") then
+                        char.Head.NameESP:Destroy()
+                    end
                 end
             end
         end
@@ -796,7 +961,7 @@ RunService.Heartbeat:Connect(function()
 end)
 
 Players.PlayerRemoving:Connect(function(p)
-    if ChamsContainer[p.Name] then pcall(function() ChamsContainer[p.Name]:Destroy() end) ChamsContainer[p.Name] = nil end
+    ClearPlayerESP(p.Name)
 end)
 
 MainTab:Select()
