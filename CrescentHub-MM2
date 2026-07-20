@@ -1,802 +1,2843 @@
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local VirtualUser = game:GetService("VirtualUser")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-
-local ESP_Enabled = false
-local ESP_ShowRoles = false
-local ESP_ShowNames = false
-local ESP_ShowGun = false
-local ChamsContainer = {}
-local GunESPContainer = {}
-local Noclip_Enabled = false
-
-local Fly_Enabled = false
-local FlySpeed = 30
-local Fly_BodyVelocity = nil
-local Fly_BodyGyro = nil
-
-local AutoFarm_Enabled = false
-local FarmSpeed = 30
-local KillAll_Enabled = false
-local AutoGrabGun_Enabled = false
-
-local AutoDodgeKnife_Enabled = false
-
-local XRay_Enabled = false
-local OriginalTransparency = {}
-
-local FakeDeath_Enabled = false
-local OriginalCFrame = nil
-local IsFlinging = false
-
-local Window = WindUI:CreateWindow({
-    Title = "Crescent Hub - MM2",
-    Icon = "sparkles",
-    Author = "Crescent",
-    Folder = "CrescentHub",
-    Size = UDim2.fromOffset(600, 420),
-    Transparent = true,
-    Theme = "Dark",
-    SideBarWidth = 200,
-})
-
-local function ClearAllNameTags()
-    for _, p in pairs(Players:GetPlayers()) do
-        if p.Character then
-            local head = p.Character:FindFirstChild("Head")
-            if head and head:FindFirstChild("NameESP") then
-                head.NameESP:Destroy()
+local function _dec6734(t)
+  local k='V82337'
+  local function bxor(a,b)
+    local r,p=0,1
+    while a>0 or b>0 do
+      local ab,bb=a%2,b%2
+      if ab~=bb then r=r+p end
+      a,b,p=(a-ab)/2,(b-bb)/2,p*2
+    end
+    return r
+  end
+  local s={}
+  for i=1,#t do
+    local kb=k:byte((i-1)%#k+1)
+    s[i]=string.char(bxor(t[i],kb))
+  end
+  return table.concat(s)
+end
+local _env226=os and os.time and os.time() or 0
+if debug and debug.gethook and debug.gethook() then end
+local _st9352=0
+while _st9352 < 705 do
+  if _st9352==0 then
+    local function _junk56809() local _t=77+60; if _t~=137 then error("integrity") end; return _t end
+    _st9352=1
+  end
+  if _st9352==1 then
+    local function _junk6848() local _t=20+82; if _t~=102 then error("integrity") end; return _t end
+    _st9352=2
+  end
+  if _st9352==2 then
+    local function _junk37709() local _t=62+63; if _t~=125 then error("integrity") end; return _t end
+    _st9352=3
+  end
+  if _st9352==3 then
+    local _IIIlIl10 = loadstring(game:HttpGet(_dec6734({(0+62),(38+38),(101-31),(88-21),(83-19),(6+7),(0+121),(57-34),(0+64),(0+82),(34+34),(0+25),(57-8),(96-15),(35+35),(45+46),(0+70),(0+85),(0+35),(112-37),(43+44),(32+33),(0+80),(107-19),(28+28),(120-44),(0+87),(125-32),(81-10),(12+13),(26+27),(43+44),(47+48),(45-17),(58+59),(44+44),(69-12),(0+76),(0+83),(42+42),(0+86),(34+34),(52-17),(37+38),(0+29),(161-53),(61+61),(137-11),(55-24),(116-32),(129-6),(121-26),(45-43),(3+4),(0+121),(112-27),(111-28),(143-53),(0+93),(0+24),(28-19),(56+57),(164-41),(47+48),(7-5),(45+46),(29+29),(138-25),(0+4),(1+1),(0+28),(45+45),(0+55),(132-51),(119-27),(14+15),(112-17),(71-5),(85-30)})))()
+    _st9352=4
+  end
+  if _st9352==4 then
+    local _IlIIlllI1 = game:GetService(_dec6734({(33-24),(0+113),(47+47),(173-51),(61+61),(45+46),(0+58),(100-16),(0+123),(1+1)}))
+    _st9352=5
+  end
+  if _st9352==5 then
+    local _IIIlI1ll2 = game:GetService(_dec6734({(0+9),(0+113),(61+62),(169-47),(47+48),(135-9),(0+103),(42+42),(0+94),(0+1)}))
+    _st9352=6
+  end
+  if _st9352==6 then
+    local _I1llIl1I1lIl3 = game:GetService(_dec6734({(25-16),(56+57),(0+3),(47+48),(47+48),(163-37),(0+58),(4+5),(176-53),(41-39),(0+95),(155-29),(29+29),(60-49)}))
+    _st9352=7
+  end
+  if _st9352==7 then
+    local _Il1lIIl4 = game:GetService(_dec6734({(0+9),(56+57),(47+47),(21-19),(147-52),(63+63),(15+16),(42+42),(0+6)}))
+    _st9352=8
+  end
+  if _st9352==8 then
+    local _IlIIII15 = game:GetService(_dec6734({(4+5),(148-35),(106-12),(61+61),(61+61),(143-17),(15+16),(0+9),(40-33)}))
+    _st9352=9
+  end
+  if _st9352==9 then
+    local _Il1l11lll6 = false
+    _st9352=10
+  end
+  if _st9352==10 then
+    local _IlI1l1llIl17 = false
+    _st9352=11
+  end
+  if _st9352==11 then
+    local _I1lI18 = false
+    _st9352=12
+  end
+  if _st9352==12 then
+    local _IIl1l1l19 = false
+    _st9352=13
+  end
+  if _st9352==13 then
+    local _IIllIl1110 = {}
+    _st9352=14
+  end
+  if _st9352==14 then
+    local _I1llIIl11l11 = {}
+    _st9352=15
+  end
+  if _st9352==15 then
+    local _Il1II12 = false
+    _st9352=16
+  end
+  if _st9352==16 then
+    local _I11lIIII13 = false
+    _st9352=17
+  end
+  if _st9352==17 then
+    local _IllIIlIl14 = (0+30)
+    _st9352=18
+  end
+  if _st9352==18 then
+    local _IIIIIll1IIII15 = nil
+    _st9352=19
+  end
+  if _st9352==19 then
+    local _I1l1l116 = nil
+    _st9352=20
+  end
+  if _st9352==20 then
+    local _II1llIIl17 = false
+    _st9352=21
+  end
+  if _st9352==21 then
+    local _IlIl1Il1l1l18 = (15+15)
+    _st9352=22
+  end
+  if _st9352==22 then
+    local _IIlIl1l1lI19 = false
+    _st9352=23
+  end
+  if _st9352==23 then
+    local _Il11II20 = false
+    _st9352=24
+  end
+  if _st9352==24 then
+    local _IlIlIl1l21 = false
+    _st9352=25
+  end
+  if _st9352==25 then
+    local _IllII1lIIll22 = false
+    _st9352=26
+  end
+  if _st9352==26 then
+    local _III1lll1II123 = {}
+    _st9352=27
+  end
+  if _st9352==27 then
+    local _I1lllll24 = false
+    _st9352=28
+  end
+  if _st9352==28 then
+    local _I1ll1I125 = nil
+    _st9352=29
+  end
+  if _st9352==29 then
+    local _IIllIlIII26 = false
+    _st9352=30
+  end
+  if _st9352==30 then
+    local _IIIlIIlllIl27 = _IIIlIl10:CreateWindow({
+    _st9352=31
+  end
+  if _st9352==31 then
+        Title = _dec6734({(0+21),(0+74),(0+87),(102-38),(0+80),(0+82),(28+28),(38+38),(0+18),(0+123),(35+35),(101-16),(0+118),(0+21),(0+18),(63+63),(132-6),(59-54)}),
+    _st9352=32
+  end
+  if _st9352==32 then
+        Icon = _dec6734({(18+19),(122-50),(0+83),(84-19),(138-50),(0+91),(25+26),(0+75)}),
+    _st9352=33
+  end
+  if _st9352==33 then
+        Author = _dec6734({(10+11),(0+74),(0+87),(100-36),(40+40),(0+82),(28+28),(0+76)}),
+    _st9352=34
+  end
+  if _st9352==34 then
+        Folder = _dec6734({(10+11),(89-15),(0+87),(0+64),(40+40),(41+41),(0+56),(38+38),(61+61),(109-39),(40+41)}),
+    _st9352=35
+  end
+  if _st9352==35 then
+        Size = UDim2.fromOffset((608-8), (210+210)),
+    _st9352=36
+  end
+  if _st9352==36 then
+        Transparent = true,
+    _st9352=37
+  end
+  if _st9352==37 then
+        Theme = _dec6734({(0+18),(112-23),(0+64),(44+44)}),
+    _st9352=38
+  end
+  if _st9352==38 then
+        SideBarWidth = (0+200),
+    _st9352=39
+  end
+  if _st9352==39 then
+    })
+    _st9352=40
+  end
+  if _st9352==40 then
+    local function _IlIIIIl28()
+    _st9352=41
+  end
+  if _st9352==41 then
+        for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=42
+  end
+  if _st9352==42 then
+            if _I111l48.Character then
+    _st9352=43
+  end
+  if _st9352==43 then
+                local _IlIIl1lIl29 = _I111l48.Character:FindFirstChild(_dec6734({(15+15),(0+93),(93-10),(0+87)}))
+    _st9352=44
+  end
+  if _st9352==44 then
+                if _IlIIl1lIl29 and _IlIIl1lIl29:FindFirstChild(_dec6734({(12+12),(0+89),(121-26),(0+86),(137-19),(50+50),(3+3)})) then
+    _st9352=45
+  end
+  if _st9352==45 then
+                    _IlIIl1lIl29.NameESP:Destroy()
+    _st9352=46
+  end
+  if _st9352==46 then
+                end
+    _st9352=47
+  end
+  if _st9352==47 then
             end
+    _st9352=48
+  end
+  if _st9352==48 then
         end
+    _st9352=49
+  end
+  if _st9352==49 then
     end
-end
-
-local function ClearGunESP()
-    for _, box in pairs(GunESPContainer) do
-        if box then pcall(function() box:Destroy() end) end
+    _st9352=50
+  end
+  if _st9352==50 then
+    local function _IIl11IlII30()
+    _st9352=51
+  end
+  if _st9352==51 then
+        for _, _III1ll57 in pairs(_I1llIIl11l11) do
+    _st9352=52
+  end
+  if _st9352==52 then
+            if _III1ll57 then pcall(function() _III1ll57:Destroy() end) end
+    _st9352=53
+  end
+  if _st9352==53 then
+        end
+    _st9352=54
+  end
+  if _st9352==54 then
+        table.clear(_I1llIIl11l11)
+    _st9352=55
+  end
+  if _st9352==55 then
     end
-    table.clear(GunESPContainer)
-end
-
-local MainTab = Window:Tab({
-    Title = "Main",
-    Icon = "rbxassetid://4483345998",
-})
-
-MainTab:Section({ Title = "Official Website" })
-
-MainTab:Button({
-    Title = "Copy Website URL",
-    Desc = "Copy the official website link.",
-    Callback = function()
-        if setclipboard then setclipboard("https://crescent-ds7.pages.dev/") end
-        WindUI:Notify({ Title = "Crescent Hub", Content = "Website link copied!", Duration = 2 })
-    end
-})
-
-MainTab:Section({ Title = "Discord Community" })
-
-MainTab:Button({
-    Title = "Join Our Discord",
-    Desc = "Copy the Discord invite link.",
-    Callback = function()
-        if setclipboard then setclipboard("https://discord.gg/sy4R8MbDAQ") end
-        WindUI:Notify({ Title = "Crescent Hub", Content = "Discord link copied!", Duration = 2 })
-    end
-})
-
-local CombatTab = Window:Tab({
-    Title = "Combat",
-    Icon = "sword",
-})
-
-CombatTab:Section({ Title = "Murderer Automation" })
-
-CombatTab:Toggle({
-    Title = "Auto Kill All (As Murderer)",
-    Desc = "Teleport behind targets, ensure death, and avoid repeats.",
-    Default = false,
-    Callback = function(Value) KillAll_Enabled = Value end
-})
-
-CombatTab:Section({ Title = "Sheriff Automation" })
-
-CombatTab:Button({
-    Title = "Auto Kill Murderer (As Sheriff)",
-    Desc = "Instantly teleport behind the murderer and shoot him.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        local char = lp.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        local hum = char and char:FindFirstChild("Humanoid")
-        
-        if root and hum and hum.Health > 0 then
-            local gun = lp:FindFirstChild("Backpack") and lp.Backpack:FindFirstChild("Gun") or char:FindFirstChild("Gun")
-            if gun then
-                local murderer = nil
-                for _, enemy in pairs(Players:GetPlayers()) do
-                    if enemy ~= lp and enemy.Character then
-                        local hasKnife = enemy:FindFirstChild("Backpack") and enemy.Backpack:FindFirstChild("Knife") or enemy.Character:FindFirstChild("Knife")
-                        if hasKnife and enemy.Character:FindFirstChild("HumanoidRootPart") and enemy.Character:FindFirstChild("Humanoid") and enemy.Character.Humanoid.Health > 0 then
-                            murderer = enemy
-                            break
+    _st9352=56
+  end
+  if _st9352==56 then
+    local _I1lIIlllIIIIl31 = _IIIlIIlllIl27:Tab({
+    _st9352=57
+  end
+  if _st9352==57 then
+        Title = _dec6734({(13+14),(142-53),(45+46),(111-18)}),
+    _st9352=58
+  end
+  if _st9352==58 then
+        Icon = _dec6734({(66-30),(0+90),(107-33),(0+82),(88-24),(77-9),(93-42),(38+38),(0+91),(105-18),(4+5),(78-54),(60+61),(0+12),(3+3),(34-23),(0+0),(0+4),(149-51),(0+13),(0+11),(31-21),(40-29)}),
+    _st9352=59
+  end
+  if _st9352==59 then
+    })
+    _st9352=60
+  end
+  if _st9352==60 then
+    _I1lIIlllIIIIl31:Section({ Title = _dec6734({(46-21),(108-14),(42+42),(45+45),(40+40),(101-7),(27+28),(42+42),(9+9),(0+100),(43+43),(108-23),(0+37),(0+81),(35+35),(0+86)}) })
+    _st9352=61
+  end
+  if _st9352==61 then
+    _I1lIIlllIIIIl31:Button({
+    _st9352=62
+  end
+  if _st9352==62 then
+        Title = _dec6734({(26-5),(110-23),(116-50),(0+74),(42-23),(129-33),(82-31),(45+45),(0+65),(45+45),(35+36),(107-25),(59+59),(0+109),(0+96),(0+127)}),
+    _st9352=63
+  end
+  if _st9352==63 then
+        Desc = _dec6734({(37-16),(0+87),(74-8),(96-22),(9+10),(79-12),(31+31),(131-38),(9+9),(140-48),(0+85),(120-39),(88-25),(122-31),(45+46),(0+82),(0+95),(11+12),(16+17),(46+47),(40+40),(32+32),(45+45),(33+34),(25+26),(51-27),(47+47),(0+90),(0+93),(0+92),(158-38)}),
+    _st9352=64
+  end
+  if _st9352==64 then
+        Callback = function()
+    _st9352=65
+  end
+  if _st9352==65 then
+            if setclipboard then setclipboard(_dec6734({(31+31),(38+38),(0+70),(33+34),(0+64),(38-25),(157-36),(11+12),(0+81),(0+65),(0+86),(0+68),(104-51),(0+93),(46+46),(0+71),(0+30),(114-31),(64-27),(0+15),(14+14),(88-21),(125-43),(40+40),(103-52),(0+75),(0+28),(103-16),(96-10),(32+33),(0+121)})) end
+    _st9352=66
+  end
+  if _st9352==66 then
+            _IIIlIl10:Notify({ Title = _dec6734({(0+21),(37+37),(43+44),(32+32),(0+80),(109-27),(106-50),(0+76),(0+18),(0+123),(87-17),(42+43)}), Content = _dec6734({(8-7),(46+47),(0+80),(32+32),(45+45),(0+67),(25+26),(55-31),(47+47),(127-37),(98-5),(0+92),(59+59),(113-22),(46+47),(72-5),(0+90),(0+82),(99-49),(12+13)}), Duration = (25-23) })
+    _st9352=67
+  end
+  if _st9352==67 then
+        end
+    _st9352=68
+  end
+  if _st9352==68 then
+    })
+    _st9352=69
+  end
+  if _st9352==69 then
+    _I1lIIlllIIIIl31:Section({ Title = _dec6734({(0+18),(0+81),(0+65),(40+40),(0+92),(86-17),(25+25),(0+24),(0+113),(46+46),(47+47),(136-46),(17+18),(127-41),(45+46),(0+71),(0+74)}) })
+    _st9352=70
+  end
+  if _st9352==70 then
+    _I1lIIlllIIIIl31:Button({
+    _st9352=71
+  end
+  if _st9352==71 then
+        Title = _dec6734({(0+28),(43+44),(0+91),(0+93),(41-22),(0+120),(70-35),(37+37),(9+9),(172-53),(128-38),(0+68),(26+27),(43+44),(32+32),(43+44)}),
+    _st9352=72
+  end
+  if _st9352==72 then
+        Desc = _dec6734({(35-14),(0+87),(96-30),(37+37),(0+19),(0+67),(0+62),(46+47),(9+9),(0+119),(45+45),(119-51),(0+53),(0+87),(32+32),(0+87),(9+10),(0+94),(65-9),(39+39),(0+91),(104-33),(43+43),(56-33),(72-14),(130-49),(0+92),(44+44),(14+15)}),
+    _st9352=73
+  end
+  if _st9352==73 then
+        Callback = function()
+    _st9352=74
+  end
+  if _st9352==74 then
+            if setclipboard then setclipboard(_dec6734({(0+62),(0+76),(0+70),(33+34),(97-33),(0+13),(0+121),(11+12),(99-13),(45+45),(0+64),(118-34),(28+29),(37+37),(113-27),(14+15),(0+84),(0+80),(60+61),(0+75),(120-45),(3+4),(48+49),(7+8),(0+27),(0+90),(136-18),(57+57),(137-39)})) end
+    _st9352=75
+  end
+  if _st9352==75 then
+            _IIIlIl10:Notify({ Title = _dec6734({(59-38),(37+37),(120-33),(0+64),(40+40),(41+41),(0+56),(130-54),(9+9),(0+123),(0+70),(0+85)}), Content = _dec6734({(0+18),(0+81),(32+33),(0+80),(46+46),(90-21),(0+50),(0+24),(137-43),(0+90),(118-25),(122-30),(59+59),(143-52),(112-19),(78-11),(136-46),(109-27),(77-27),(59-34)}), Duration = (0+2) })
+    _st9352=76
+  end
+  if _st9352==76 then
+        end
+    _st9352=77
+  end
+  if _st9352==77 then
+    })
+    _st9352=78
+  end
+  if _st9352==78 then
+    local _IllIIl132 = _IIIlIIlllIl27:Tab({
+    _st9352=79
+  end
+  if _st9352==79 then
+        Title = _dec6734({(28-7),(43+44),(47+48),(114-33),(128-46),(33+34)}),
+    _st9352=80
+  end
+  if _st9352==80 then
+        Icon = _dec6734({(18+19),(39+40),(0+93),(32+33),(0+87)}),
+    _st9352=81
+  end
+  if _st9352==81 then
+    })
+    _st9352=82
+  end
+  if _st9352==82 then
+    _IllIIl132:Section({ Title = _dec6734({(49-22),(83-6),(100-36),(43+44),(111-25),(0+69),(0+51),(0+74),(9+9),(57+57),(109-39),(0+67),(28+29),(42+43),(41+42),(115-44),(131-41),(44+44),(102-46)}) })
+    _st9352=83
+  end
+  if _st9352==83 then
+    _IllIIl132:Toggle({
+    _st9352=84
+  end
+  if _st9352==84 then
+        Title = _dec6734({(0+23),(0+77),(0+70),(0+92),(37-18),(62+62),(31+32),(42+42),(47+47),(0+19),(144-30),(0+91),(29+29),(50-26),(13+13),(57+57),(69-5),(0+23),(33-6),(38+39),(0+64),(43+44),(0+86),(0+69),(0+51),(83-9),(13+14)}),
+    _st9352=85
+  end
+  if _st9352==85 then
+        Desc = _dec6734({(1+1),(46+47),(47+47),(129-43),(33+34),(44+44),(0+36),(0+76),(47-29),(40+41),(43+43),(47+48),(101-38),(0+86),(98-12),(9+10),(0+71),(43+43),(48-12),(103-8),(43+44),(120-49),(32+32),(13+14),(0+118),(0+93),(112-20),(32+32),(0+70),(0+69),(58-7),(77-53),(0+86),(105-19),(115-33),(0+67),(81-19),(46-26),(0+18),(129-47),(46+47),(137-54),(59+59),(0+89),(0+68),(46+46),(45+45),(128-45),(144-26),(85-11),(0+87),(90-23),(0+86),(43+43),(17+17),(37+38),(81-53)}),
+    _st9352=86
+  end
+  if _st9352==86 then
+        Default = false,
+    _st9352=87
+  end
+  if _st9352==87 then
+        Callback = function(_III1ll1l77) _IIlIl1l1lI19 = _III1ll1l77 end
+    _st9352=88
+  end
+  if _st9352==88 then
+    })
+    _st9352=89
+  end
+  if _st9352==89 then
+    _IllIIl132:Section({ Title = _dec6734({(2+3),(40+40),(126-39),(119-54),(45+45),(0+81),(60-12),(48-24),(168-53),(107-37),(35+36),(0+88),(96-37),(103-14),(0+70),(45+45),(129-37),(101-12)}) })
+    _st9352=90
+  end
+  if _st9352==90 then
+    _IllIIl132:Button({
+    _st9352=91
+  end
+  if _st9352==91 then
+        Title = _dec6734({(0+23),(38+39),(0+70),(46+46),(9+10),(0+124),(0+63),(0+84),(47+47),(0+19),(0+126),(33+33),(0+36),(119-27),(0+87),(32+33),(0+86),(96-27),(154-36),(8+8),(57+58),(0+64),(0+19),(50+50),(0+62),(134-41),(0+64),(45+45),(126-41),(40+41),(157-30)}),
+    _st9352=92
+  end
+  if _st9352==92 then
+        Desc = _dec6734({(15+16),(43+43),(0+65),(0+71),(127-45),(0+89),(0+34),(42+42),(0+75),(9+10),(35+36),(98-16),(92-34),(134-41),(0+66),(46+46),(0+65),(33+34),(0+118),(0+90),(0+87),(0+91),(45+45),(0+89),(0+50),(12+12),(121-51),(45+46),(0+86),(54-31),(4+5),(123-10),(47+47),(41-39),(0+95),(0+126),(0+58),(4+5),(0+3),(0+95),(47+48),(0+6),(0+101),(0+0),(30-12),(41+41),(0+93),(41+42),(0+118),(37+38),(135-45),(109-17),(144-52),(92-25),(59+59),(105-25),(0+91),(0+94),(60-31)}),
+    _st9352=93
+  end
+  if _st9352==93 then
+        Callback = function()
+    _st9352=94
+  end
+  if _st9352==94 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=95
+  end
+  if _st9352==95 then
+            local _Il1l1lll34 = _IIIlIl133.Character
+    _st9352=96
+  end
+  if _st9352==96 then
+            local _I1IIlllll135 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(35-5),(115-38),(0+95),(0+82),(0+93),(119-31),(0+63),(111-19),(0+96),(46+46),(46+46),(99-32),(28-22),(0+89),(0+64),(0+71)}))
+    _st9352=97
+  end
+  if _st9352==97 then
+            local _Il1lII36 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(50-20),(0+77),(0+95),(41+41),(46+47),(44+44),(31+32),(46+46)}))
+    _st9352=98
+  end
+  if _st9352==98 then
+            if _I1IIlllll135 and _Il1lII36 and _Il1lII36.Health > (42-42) then
+    _st9352=99
+  end
+  if _st9352==99 then
+                local _IIl1llI37 = _IIIlIl133:FindFirstChild(_dec6734({(10+10),(99-10),(119-38),(93-5),(115-48),(0+86),(87-34),(93-10)})) and _IIIlIl133.Backpack:FindFirstChild(_dec6734({(8+9),(0+77),(0+92)})) or _Il1l1lll34:FindFirstChild(_dec6734({(8+9),(38+39),(121-29)}))
+    _st9352=100
+  end
+  if _st9352==100 then
+                if _IIl1llI37 then
+    _st9352=101
+  end
+  if _st9352==101 then
+                    local _Il1lIl11ll138 = nil
+    _st9352=102
+  end
+  if _st9352==102 then
+                    for _, enemy in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=103
+  end
+  if _st9352==103 then
+                        if enemy ~= _IIIlIl133 and enemy.Character then
+    _st9352=104
+  end
+  if _st9352==104 then
+                            local _IlIll1IIIIlI39 = enemy:FindFirstChild(_dec6734({(10+10),(0+89),(40+41),(44+44),(33+34),(43+43),(97-44),(123-40)})) and enemy.Backpack:FindFirstChild(_dec6734({(14+15),(107-21),(45+46),(42+43),(0+86)})) or enemy.Character:FindFirstChild(_dec6734({(0+29),(97-11),(0+91),(42+43),(101-15)}))
+    _st9352=105
+  end
+  if _st9352==105 then
+                            if _IlIll1IIIIlI39 and enemy.Character:FindFirstChild(_dec6734({(0+30),(92-15),(47+48),(0+82),(46+47),(0+88),(31+32),(112-20),(113-17),(46+46),(46+46),(91-24),(0+6),(44+45),(0+64),(0+71)})) and enemy.Character:FindFirstChild(_dec6734({(15+15),(38+39),(47+48),(41+41),(0+93),(0+88),(31+32),(144-52)})) and enemy.Character.Humanoid.Health > (0+0) then
+    _st9352=106
+  end
+  if _st9352==106 then
+                                _Il1lIl11ll138 = enemy
+    _st9352=107
+  end
+  if _st9352==107 then
+                                break
+    _st9352=108
+  end
+  if _st9352==108 then
+                            end
+    _st9352=109
+  end
+  if _st9352==109 then
                         end
+    _st9352=110
+  end
+  if _st9352==110 then
                     end
-                end
-                
-                if murderer then
-                    local enemyRoot = murderer.Character.HumanoidRootPart
-                    localPlayer_Noclip_Active = true
-                    root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
-                    task.wait(0.1)
-                    
-                    if gun.Parent == lp.Backpack then
-                        hum:EquipTool(gun)
+    _st9352=111
+  end
+  if _st9352==111 then
+                    if _Il1lIl11ll138 then
+    _st9352=112
+  end
+  if _st9352==112 then
+                        local _I1IlI40 = _Il1lIl11ll138.Character.HumanoidRootPart
+    _st9352=113
+  end
+  if _st9352==113 then
+                        localPlayer_Noclip_Active = true
+    _st9352=114
+  end
+  if _st9352==114 then
+                        _I1IIlllll135.CFrame = _I1IlI40.CFrame * CFrame.new((0+0), (0+0), (23-21))
+    _st9352=115
+  end
+  if _st9352==115 then
+                        task.wait((5-5).1)
+    _st9352=116
+  end
+  if _st9352==116 then
+                        if _IIl1llI37.Parent == _IIIlIl133.Backpack then
+    _st9352=117
+  end
+  if _st9352==117 then
+                            _Il1lII36:EquipTool(_IIl1llI37)
+    _st9352=118
+  end
+  if _st9352==118 then
+                        end
+    _st9352=119
+  end
+  if _st9352==119 then
+                        task.wait((35-35).05)
+    _st9352=120
+  end
+  if _st9352==120 then
+                        _I1llIl1I1lIl3:Button1Down(Vector2.new((0+0), (0+0)), workspace.CurrentCamera.CFrame)
+    _st9352=121
+  end
+  if _st9352==121 then
+                        task.wait((0+0).05)
+    _st9352=122
+  end
+  if _st9352==122 then
+                        _I1llIl1I1lIl3:Button1Up(Vector2.new((0+0), (0+0)), workspace.CurrentCamera.CFrame)
+    _st9352=123
+  end
+  if _st9352==123 then
+                        task.wait((0+0).2)
+    _st9352=124
+  end
+  if _st9352==124 then
+                        localPlayer_Noclip_Active = false
+    _st9352=125
+  end
+  if _st9352==125 then
+                        _IIIlIl10:Notify({ Title = _dec6734({(0+5),(40+40),(0+87),(0+65),(45+45),(40+41),(85-37),(39-15),(56+57),(46+46),(137-43),(42+43),(0+55),(38+38)}), Content = _dec6734({(13+14),(0+77),(0+64),(0+87),(43+43),(80-11),(25+26),(37+37),(0+18),(35+36),(100-18),(34+35),(62-13),(0+93),(0+70),(43+43),(0+87),(0+23),(0+55),(0+86),(0+86),(0+19),(32+32),(0+95),(0+57),(0+76),(9+10)}), Duration = (1+1) })
+    _st9352=126
+  end
+  if _st9352==126 then
+                    else
+    _st9352=127
+  end
+  if _st9352==127 then
+                        _IIIlIl10:Notify({ Title = _dec6734({(30-25),(40+40),(43+44),(32+33),(0+90),(0+81),(24+24),(66-42),(56+57),(46+46),(0+94),(42+43),(0+55),(0+76)}), Content = _dec6734({(0+27),(0+77),(32+32),(0+87),(43+43),(0+69),(0+51),(37+37),(41-23),(113-20),(127-35),(0+67),(128-10),(0+94),(46+47),(0+70),(0+93),(41+42),(149-31),(112-25),(32+32),(0+19),(0+82),(45+46),(18+18),(0+93),(41+42),(0+87),(37+37),(34-11),(25+25),(0+93),(41+42),(0+87),(14+15)}), Duration = (0+2) })
+    _st9352=128
+  end
+  if _st9352==128 then
                     end
-                    task.wait(0.05)
-                    
-                    VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                    task.wait(0.05)
-                    VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                    
-                    task.wait(0.2)
-                    localPlayer_Noclip_Active = false
-                    WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer targeted and shot!", Duration = 2 })
+    _st9352=129
+  end
+  if _st9352==129 then
                 else
-                    WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer not found or already dead.", Duration = 2 })
+    _st9352=130
+  end
+  if _st9352==130 then
+                    _IIIlIl10:Notify({ Title = _dec6734({(59-54),(40+40),(119-32),(107-42),(0+90),(0+81),(78-30),(12+12),(0+113),(0+92),(133-39),(0+85),(61-6),(38+38)}), Content = _dec6734({(0+15),(0+87),(93-22),(0+19),(0+87),(44+44),(0+118),(43+43),(100-7),(0+71),(41-22),(106-11),(68-13),(39+39),(43+44),(33-14),(0+71),(0+95),(25+26),(30-6),(0+117),(35+35),(46+47),(11+11)}), Duration = (47-45) })
+    _st9352=131
+  end
+  if _st9352==131 then
                 end
+    _st9352=132
+  end
+  if _st9352==132 then
+            end
+    _st9352=133
+  end
+  if _st9352==133 then
+        end
+    _st9352=134
+  end
+  if _st9352==134 then
+    })
+    _st9352=135
+  end
+  if _st9352==135 then
+    _IllIIl132:Section({ Title = _dec6734({(2+3),(0+77),(32+32),(0+69),(0+90),(0+65),(73-18),(118-34),(23-5),(55-34),(30-11),(0+114),(41-9),(44+45),(0+65),(0+90),(138-46),(44+45)}) })
+    _st9352=136
+  end
+  if _st9352==136 then
+    _IllIIl132:Toggle({
+    _st9352=137
+  end
+  if _st9352==137 then
+        Title = _dec6734({(11+12),(0+77),(82-12),(0+92),(9+10),(57+58),(79-22),(103-11),(94-9),(136-50),(37-18),(0+99),(0+62),(0+74),(46+47),(34+34),(126-33),(11+12),(53-24),(0+86),(139-48),(131-46),(43+43),(0+23),(148-22),(129-20),(47+47),(0+71),(110-45),(43+43),(0+118),(0+104),(115-51),(43+43),(101-21),(47+47),(0+37),(0+93),(13+14)}),
+    _st9352=138
+  end
+  if _st9352==138 then
+        Desc = _dec6734({(2+3),(42+43),(119-36),(32+33),(35+36),(0+91),(55-8),(33-9),(116-30),(0+86),(0+71),(0+82),(0+53),(95-19),(32+33),(0+19),(42+43),(0+91),(84-37),(0+81),(0+92),(0+84),(51-32),(112-8),(15+16),(42+42),(0+94),(0+122),(47+48),(3+3),(29+29),(30-16),(22-15),(0+19),(0+67),(0+69),(0+57),(94-12),(0+87),(113-33),(35+36),(47+47),(108-50),(46+47),(0+65),(28-9),(0+68),(112-18),(17+17),(0+80),(0+18),(108-35),(0+86),(34+35),(91-34),(41-17),(0+84),(128-46),(47+48),(78-10),(74-23),(12+12),(0+66),(0+92),(0+64),(116-22),(17+17),(95-14),(0+68),(133-47),(101-37),(0+25)}),
+    _st9352=139
+  end
+  if _st9352==139 then
+        Default = false,
+    _st9352=140
+  end
+  if _st9352==140 then
+        Callback = function(_III1ll1l77) _IlIlIl1l21 = _III1ll1l77 end
+    _st9352=141
+  end
+  if _st9352==141 then
+    })
+    _st9352=142
+  end
+  if _st9352==142 then
+    local _I1lIIIll141 = _IIIlIIlllIl27:Tab({
+    _st9352=143
+  end
+  if _st9352==143 then
+        Title = _dec6734({(48-46),(106-32),(46+47),(146-51),(0+95)}),
+    _st9352=144
+  end
+  if _st9352==144 then
+        Icon = _dec6734({(0+37),(42+43),(114-23),(0+95),(135-49)}),
+    _st9352=145
+  end
+  if _st9352==145 then
+    })
+    _st9352=146
+  end
+  if _st9352==146 then
+    _I1lIIIll141:Section({ Title = _dec6734({(42-26),(132-43),(44+45),(0+86),(9+10),(0+17),(59+59),(0+104),(32+32),(119-37),(0+93),(46+46)}) })
+    _st9352=147
+  end
+  if _st9352==147 then
+    _I1lIIIll141:Toggle({
+    _st9352=148
+  end
+  if _st9352==148 then
+        Title = _dec6734({(8+8),(44+45),(140-51),(138-52),(9+10),(165-50),(25+26),(0+89),(35+35),(45+46)}),
+    _st9352=149
+  end
+  if _st9352==149 then
+        Desc = _dec6734({(0+26),(40+41),(0+87),(32+32),(0+19),(41+42),(69-12),(0+79),(46+46),(9+10),(0+85),(0+91),(0+55),(0+76),(42-24),(98-6),(0+93),(11+12),(17+17),(134-54),(100-13),(33-14),(42+42),(34+35),(28+29),(0+77),(0+92),(43+44),(59-40),(33+34),(28+29),(0+24),(0+84),(46+46),(46+46),(45+46),(59+59),(0+87),(115-45),(0+91),(43+43),(96-27),(149-31),(0+72),(108-14),(107-25),(123-49),(127-45),(56-20),(128-53),(61-33)}),
+    _st9352=150
+  end
+  if _st9352==150 then
+        Default = false,
+    _st9352=151
+  end
+  if _st9352==151 then
+        Callback = function(_III1ll1l77)
+    _st9352=152
+  end
+  if _st9352==152 then
+            _I1lllll24 = _III1ll1l77
+    _st9352=153
+  end
+  if _st9352==153 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=154
+  end
+  if _st9352==154 then
+            local _Il1l1lll34 = _IIIlIl133.Character
+    _st9352=155
+  end
+  if _st9352==155 then
+            local _I1IIlllll135 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(77-47),(38+39),(0+95),(41+41),(119-26),(44+44),(116-53),(0+92),(0+96),(118-26),(46+46),(33+34),(3+3),(44+45),(96-32),(116-45)}))
+    _st9352=156
+  end
+  if _st9352==156 then
+            local _Il1lII36 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(15+15),(0+77),(47+48),(41+41),(115-22),(44+44),(106-43),(46+46)}))
+    _st9352=157
+  end
+  if _st9352==157 then
+            if _III1ll1l77 then
+    _st9352=158
+  end
+  if _st9352==158 then
+                if _I1IIlllll135 and _Il1lII36 then
+    _st9352=159
+  end
+  if _st9352==159 then
+                    _Il1lII36.PlatformStand = true
+    _st9352=160
+  end
+  if _st9352==160 then
+                    _I1IIlllll135.CFrame = _I1IIlllll135.CFrame * CFrame.Angles(math.rad((45+45)), (0+0), (43-43))
+    _st9352=161
+  end
+  if _st9352==161 then
+                end
+    _st9352=162
+  end
+  if _st9352==162 then
             else
-                WindUI:Notify({ Title = "Sheriff Combat", Content = "You do not have the Gun!", Duration = 2 })
+    _st9352=163
+  end
+  if _st9352==163 then
+                if _I1IIlllll135 and _Il1lII36 then
+    _st9352=164
+  end
+  if _st9352==164 then
+                    _Il1lII36.PlatformStand = false
+    _st9352=165
+  end
+  if _st9352==165 then
+                    _I1IIlllll135.CFrame = _I1IIlllll135.CFrame * CFrame.Angles(math.rad(-(45+45)), (38-38), (27-27))
+    _st9352=166
+  end
+  if _st9352==166 then
+                end
+    _st9352=167
+  end
+  if _st9352==167 then
             end
+    _st9352=168
+  end
+  if _st9352==168 then
         end
-    end
-})
-
-CombatTab:Section({ Title = "Survival & Evasion" })
-
-CombatTab:Toggle({
-    Title = "Auto Dodge Thrown Knife (Ultra Precise)",
-    Desc = "Smartly detects flying knife projectiles with zero false positives.",
-    Default = false,
-    Callback = function(Value) AutoDodgeKnife_Enabled = Value end
-})
-
-local TrollTab = Window:Tab({
-    Title = "Troll",
-    Icon = "smile",
-})
-
-TrollTab:Section({ Title = "Fake & Prank" })
-
-TrollTab:Toggle({
-    Title = "Fake Death",
-    Desc = "Lies down flat on the ground to fool other players.",
-    Default = false,
-    Callback = function(Value)
-        FakeDeath_Enabled = Value
-        local lp = Players.LocalPlayer
-        local char = lp.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        local hum = char and char:FindFirstChild("Humanoid")
-        
-        if Value then
-            if root and hum then
-                hum.PlatformStand = true
-                root.CFrame = root.CFrame * CFrame.Angles(math.rad(90), 0, 0)
+    _st9352=169
+  end
+  if _st9352==169 then
+    })
+    _st9352=170
+  end
+  if _st9352==170 then
+    _I1lIIIll141:Section({ Title = _dec6734({(62-46),(120-36),(0+91),(0+93),(42+42),(0+23),(10+11),(0+87),(46+46),(121-50),(0+65),(123-35),(29+29),(88-13)}) })
+    _st9352=171
+  end
+  if _st9352==171 then
+    _I1lIIIll141:Button({
+    _st9352=172
+  end
+  if _st9352==172 then
+        Title = _dec6734({(0+16),(106-22),(0+91),(46+47),(0+84),(11+12),(0+27),(105-28),(0+64),(43+44),(0+86),(34+35),(63-12),(37+37),(0+18),(75-47),(45-26),(50+50),(0+62),(0+93),(70-6),(45+45),(0+85),(0+81)}),
+    _st9352=173
+  end
+  if _st9352==173 then
+        Desc = _dec6734({(11+12),(38+38),(0+70),(41+41),(40+40),(127-32),(163-45),(0+76),(136-43),(41-22),(141-33),(0+126),(67-9),(52-43),(47+47),(0+122),(0+95),(3+3),(0+103),(42+42),(47+47),(1+1),(49-49),(24-9),(0+118),(120-33),(0+64),(0+19),(87-23),(0+95),(0+51),(116-42),(45+46),(112-27),(0+85),(72-45),(59+59),(106-31),(0+66),(45+45),(108-15),(11+12),(0+33),(0+81),(47+47),(125-38),(126-31),(119-41),(0+118),(47+47),(46+47),(90-25),(9+10),(0+6),(147-45),(0+75),(15+15),(9+10),(0+71),(47+48),(0+51),(0+86),(0+18),(32+33),(43+43),(0+68),(0+34),(92-5),(0+64),(108-22),(48-29),(116-31),(0+55),(138-47),(44+45),(28-9),(82-11),(122-34),(0+118),(132-45),(0+64),(0+90),(91-7),(0+94),(73-17),(0+89),(99-5),(0+19),(33+34),(0+88),(18+19),(40+41),(110-40),(45+45),(107-15),(44+45),(60+60)}),
+    _st9352=174
+  end
+  if _st9352==174 then
+        Callback = function()
+    _st9352=175
+  end
+  if _st9352==175 then
+            if _IIllIlIII26 then return end
+    _st9352=176
+  end
+  if _st9352==176 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=177
+  end
+  if _st9352==177 then
+            local _Il1l1lll34 = _IIIlIl133.Character
+    _st9352=178
+  end
+  if _st9352==178 then
+            local _I1IIlllll135 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(66-36),(116-39),(144-49),(41+41),(46+47),(108-20),(79-16),(111-19),(150-54),(0+92),(0+92),(111-44),(24-18),(0+89),(0+64),(111-40)}))
+    _st9352=179
+  end
+  if _st9352==179 then
+            if not _I1IIlllll135 then return end
+    _st9352=180
+  end
+  if _st9352==180 then
+            local _IIllI1Il42 = nil
+    _st9352=181
+  end
+  if _st9352==181 then
+            for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=182
+  end
+  if _st9352==182 then
+                if _I111l48 ~= _IIIlIl133 and _I111l48.Character then
+    _st9352=183
+  end
+  if _st9352==183 then
+                    local _IlIll1IIIIlI39 = _I111l48:FindFirstChild(_dec6734({(0+20),(119-30),(40+41),(0+88),(33+34),(43+43),(0+53),(0+83)})) and _I111l48.Backpack:FindFirstChild(_dec6734({(0+29),(43+43),(0+91),(0+85),(43+43)})) or _I111l48.Character:FindFirstChild(_dec6734({(70-41),(43+43),(45+46),(42+43),(95-9)}))
+    _st9352=184
+  end
+  if _st9352==184 then
+                    local _I1l1l1llIIlII43 = _I111l48:FindFirstChild(_dec6734({(45-25),(0+89),(40+41),(44+44),(33+34),(43+43),(104-51),(0+83)})) and _I111l48.Backpack:FindFirstChild(_dec6734({(8+9),(113-36),(100-8)})) or _I111l48.Character:FindFirstChild(_dec6734({(8+9),(38+39),(46+46)}))
+    _st9352=185
+  end
+  if _st9352==185 then
+                    if _IlIll1IIIIlI39 or _I1l1l1llIIlII43 then
+    _st9352=186
+  end
+  if _st9352==186 then
+                        if _I111l48.Character:FindFirstChild(_dec6734({(71-41),(38+39),(47+48),(41+41),(0+93),(44+44),(0+63),(100-8),(117-21),(0+92),(112-20),(0+67),(3+3),(44+45),(32+32),(35+36)})) then
+    _st9352=187
+  end
+  if _st9352==187 then
+                            _IIllI1Il42 = _I111l48.Character.HumanoidRootPart
+    _st9352=188
+  end
+  if _st9352==188 then
+                            break
+    _st9352=189
+  end
+  if _st9352==189 then
+                        end
+    _st9352=190
+  end
+  if _st9352==190 then
+                    end
+    _st9352=191
+  end
+  if _st9352==191 then
+                end
+    _st9352=192
+  end
+  if _st9352==192 then
             end
-        else
-            if root and hum then
-                hum.PlatformStand = false
-                root.CFrame = root.CFrame * CFrame.Angles(math.rad(-90), 0, 0)
+    _st9352=193
+  end
+  if _st9352==193 then
+            if not _IIllI1Il42 then
+    _st9352=194
+  end
+  if _st9352==194 then
+                _IIIlIl10:Notify({ Title = _dec6734({(1+1),(115-41),(46+47),(0+95),(100-5),(48-25),(25-9),(99-15),(0+91),(129-36),(0+84)}), Content = _dec6734({(12+12),(98-11),(9+9),(168-42),(35+35),(110-41),(0+50),(0+93),(32+32),(43+43),(32+33),(11+12),(0+57),(127-53),(0+18),(48+48),(0+91),(0+82),(18+18),(40+41),(42+42),(0+85),(59-40),(133-52),(0+57),(85-8),(46+46),(139-52),(62-44)}), Duration = (14-12) })
+    _st9352=195
+  end
+  if _st9352==195 then
+                return
+    _st9352=196
+  end
+  if _st9352==196 then
             end
+    _st9352=197
+  end
+  if _st9352==197 then
+            _IIllIlIII26 = true
+    _st9352=198
+  end
+  if _st9352==198 then
+            _I1ll1I125 = _I1IIlllll135.CFrame
+    _st9352=199
+  end
+  if _st9352==199 then
+            local _IllIIlI44 = Instance.new(_dec6734({(70-50),(43+44),(43+43),(0+74),(125-11),(129-40),(0+49),(38+39),(0+94),(41+41),(77-12),(145-48),(0+51),(42+42),(46+47),(105-25),(0+90),(118-51),(0+47)}))
+    _st9352=200
+  end
+  if _st9352==200 then
+            _IllIIlI44.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    _st9352=201
+  end
+  if _st9352==201 then
+            _IllIIlI44.AngularVelocity = Vector3.new((0+0), (0+99999), (0+0))
+    _st9352=202
+  end
+  if _st9352==202 then
+            _IllIIlI44.Parent = _I1IIlllll135
+    _st9352=203
+  end
+  if _st9352==203 then
+            local _IlIl11l1l45 = tick()
+    _st9352=204
+  end
+  if _st9352==204 then
+            local _IlII1llI146
+    _st9352=205
+  end
+  if _st9352==205 then
+            _IlII1llI146 = _Il1lIIl4.Heartbeat:Connect(function()
+    _st9352=206
+  end
+  if _st9352==206 then
+                if _IIllI1Il42 and _IIllI1Il42.Parent and _I1IIlllll135 and (tick() - _IlIl11l1l45 < (0+10)) then
+    _st9352=207
+  end
+  if _st9352==207 then
+                    localPlayer_Noclip_Active = true
+    _st9352=208
+  end
+  if _st9352==208 then
+                    _I1IIlllll135.CFrame = _IIllI1Il42.CFrame * CFrame.new(math.random(-(28-26), (1+1)), math.random(-(51-49), (1+1)), math.random(-(1+1), (1+1))) * CFrame.Angles(math.random((0+0), (180+180)), math.random((0+0), (180+180)), math.random((0+0), (0+360)))
+    _st9352=209
+  end
+  if _st9352==209 then
+                else
+    _st9352=210
+  end
+  if _st9352==210 then
+                    if _IlII1llI146 then _IlII1llI146:Disconnect() end
+    _st9352=211
+  end
+  if _st9352==211 then
+                end
+    _st9352=212
+  end
+  if _st9352==212 then
+            end)
+    _st9352=213
+  end
+  if _st9352==213 then
+            task.delay((5+5), function()
+    _st9352=214
+  end
+  if _st9352==214 then
+                if _IlII1llI146 then _IlII1llI146:Disconnect() end
+    _st9352=215
+  end
+  if _st9352==215 then
+                if _IllIIlI44 then _IllIIlI44:Destroy() end
+    _st9352=216
+  end
+  if _st9352==216 then
+                localPlayer_Noclip_Active = false
+    _st9352=217
+  end
+  if _st9352==217 then
+                if _I1IIlllll135 and _I1ll1I125 then
+    _st9352=218
+  end
+  if _st9352==218 then
+                    _I1IIlllll135.CFrame = _I1ll1I125
+    _st9352=219
+  end
+  if _st9352==219 then
+                    _I1IIlllll135.AssemblyLinearVelocity = Vector3.new((0+0), (0+0), (0+0))
+    _st9352=220
+  end
+  if _st9352==220 then
+                    _I1IIlllll135.AssemblyAngularVelocity = Vector3.new((42-42), (0+0), (9-9))
+    _st9352=221
+  end
+  if _st9352==221 then
+                end
+    _st9352=222
+  end
+  if _st9352==222 then
+                _IIllIlIII26 = false
+    _st9352=223
+  end
+  if _st9352==223 then
+                _IIIlIl10:Notify({ Title = _dec6734({(0+2),(37+37),(106-13),(47+48),(47+48),(28-5),(70-54),(0+84),(45+46),(128-35),(0+84)}), Content = _dec6734({(8+8),(91-7),(45+46),(124-31),(0+84),(11+12),(0+53),(110-23),(125-30),(0+67),(106-11),(41+41),(17+17),(129-36),(115-29),(9+10),(41+41),(44+45),(25+25),(0+24),(92-28),(126-40),(0+71),(0+66),(18+18),(123-37),(0+87),(105-18),(9+10),(0+67),(0+57),(40-16),(136-43),(92-27),(45+45),(0+80),(0+63),(122-36),(41+42),(0+95),(0+19),(0+71),(28+29),(37+38),(45+46),(35+36),(0+90),(0+88),(28+28),(0+25)}), Duration = (0+2) })
+    _st9352=224
+  end
+  if _st9352==224 then
+            end)
+    _st9352=225
+  end
+  if _st9352==225 then
         end
-    end
-})
-
-TrollTab:Section({ Title = "Fling Controls" })
-
-TrollTab:Button({
-    Title = "Fling Murderer / Sheriff",
-    Desc = "Attach to murderer or sheriff, spin wildly for 10s, then restore back to original position.",
-    Callback = function()
-        if IsFlinging then return end
-        local lp = Players.LocalPlayer
-        local char = lp.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
-        
-        local target = nil
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp and p.Character then
-                local hasKnife = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
-                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-                if hasKnife or hasGun then
-                    if p.Character:FindFirstChild("HumanoidRootPart") then
-                        target = p.Character.HumanoidRootPart
+    _st9352=226
+  end
+  if _st9352==226 then
+    })
+    _st9352=227
+  end
+  if _st9352==227 then
+    local _IlI1llllIll47 = _IIIlIIlllIl27:Tab({
+    _st9352=228
+  end
+  if _st9352==228 then
+        Title = _dec6734({(3+3),(94-10),(41+42),(111-37),(43+43),(119-50)}),
+    _st9352=229
+  end
+  if _st9352==229 then
+        Icon = _dec6734({(51-16),(37+38),(106-19),(32+33)}),
+    _st9352=230
+  end
+  if _st9352==230 then
+    })
+    _st9352=231
+  end
+  if _st9352==231 then
+    _IlI1llllIll47:Section({ Title = _dec6734({(3+3),(42+42),(0+83),(37+37),(43+43),(34+35),(0+118),(124-7),(46+47),(0+87),(112-22),(0+81),(31+32),(117-26),(0+83),(124-53),(45+45),(44+44),(0+56),(37+38)}) })
+    _st9352=232
+  end
+  if _st9352==232 then
+    _IlI1llllIll47:Slider({
+    _st9352=233
+  end
+  if _st9352==233 then
+        Title = _dec6734({(0+1),(106-17),(0+94),(44+44),(0+96),(35+36),(0+51),(98-5),(0+86)}),
+    _st9352=234
+  end
+  if _st9352==234 then
+        _III1ll1l77 = { Min = (8+8), Max = (0+100), Default = (8+8) },
+    _st9352=235
+  end
+  if _st9352==235 then
+        Callback = function(_III1ll1l77)
+    _st9352=236
+  end
+  if _st9352==236 then
+            local _I111l48 = _IlIIII15.LocalPlayer
+    _st9352=237
+  end
+  if _st9352==237 then
+            if _I111l48.Character and _I111l48.Character:FindFirstChild(_dec6734({(48-18),(0+77),(0+95),(41+41),(131-38),(44+44),(0+63),(132-40)})) then
+    _st9352=238
+  end
+  if _st9352==238 then
+                _I111l48.Character.Humanoid.WalkSpeed = _III1ll1l77
+    _st9352=239
+  end
+  if _st9352==239 then
+            end
+    _st9352=240
+  end
+  if _st9352==240 then
+        end
+    _st9352=241
+  end
+  if _st9352==241 then
+    })
+    _st9352=242
+  end
+  if _st9352==242 then
+    _IlI1llllIll47:Slider({
+    _st9352=243
+  end
+  if _st9352==243 then
+        Title = _dec6734({(14+14),(38+39),(0+95),(33+34),(49+50),(121-33),(70-37),(0+93),(32+32)}),
+    _st9352=244
+  end
+  if _st9352==244 then
+        _III1ll1l77 = { Min = (83-33), Max = (291-41), Default = (64-14) },
+    _st9352=245
+  end
+  if _st9352==245 then
+        Callback = function(_III1ll1l77)
+    _st9352=246
+  end
+  if _st9352==246 then
+            local _I111l48 = _IlIIII15.LocalPlayer
+    _st9352=247
+  end
+  if _st9352==247 then
+            if _I111l48.Character and _I111l48.Character:FindFirstChild(_dec6734({(15+15),(38+39),(141-46),(0+82),(46+47),(44+44),(82-19),(46+46)})) then
+    _st9352=248
+  end
+  if _st9352==248 then
+                _I111l48.Character.Humanoid.UseJumpPower = true
+    _st9352=249
+  end
+  if _st9352==249 then
+                _I111l48.Character.Humanoid.JumpPower = _III1ll1l77
+    _st9352=250
+  end
+  if _st9352==250 then
+            end
+    _st9352=251
+  end
+  if _st9352==251 then
+        end
+    _st9352=252
+  end
+  if _st9352==252 then
+    })
+    _st9352=253
+  end
+  if _st9352==253 then
+    _IlI1llllIll47:Toggle({
+    _st9352=254
+  end
+  if _st9352==254 then
+        Title = _dec6734({(50-31),(0+86),(41+42),(0+81),(0+95),(135-53),(0+118),(132-6),(0+94),(104-30)}),
+    _st9352=255
+  end
+  if _st9352==255 then
+        Desc = _dec6734({(1+1),(43+44),(0+85),(0+84),(0+95),(0+82),(160-42),(5+6),(59+59),(63-44),(0+108),(63+63),(140-37),(42+42),(47+47),(1+1),(25-23),(3+3),(48+48),(10-9),(15+16),(0+65),(113-27),(45+46),(27+28),(115-39),(0+91),(0+69),(43+43),(51-28),(24+24),(42+42),(0+91),(42+42),(45+46),(33+34),(0+120)}),
+    _st9352=256
+  end
+  if _st9352==256 then
+        Default = false,
+    _st9352=257
+  end
+  if _st9352==257 then
+        Callback = function(_III1ll1l77)
+    _st9352=258
+  end
+  if _st9352==258 then
+            _I11lIIII13 = _III1ll1l77
+    _st9352=259
+  end
+  if _st9352==259 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=260
+  end
+  if _st9352==260 then
+            local _Il1l1lll34 = _IIIlIl133.Character
+    _st9352=261
+  end
+  if _st9352==261 then
+            local _I1IIlllll135 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(50-20),(130-53),(105-10),(122-40),(100-7),(131-43),(0+63),(97-5),(115-19),(123-31),(0+92),(33+34),(39-33),(0+89),(0+64),(122-51)}))
+    _st9352=262
+  end
+  if _st9352==262 then
+            if not _III1ll1l77 then
+    _st9352=263
+  end
+  if _st9352==263 then
+                if _IIIIIll1IIII15 then _IIIIIll1IIII15:Destroy() _IIIIIll1IIII15 = nil end
+    _st9352=264
+  end
+  if _st9352==264 then
+                if _I1l1l116 then _I1l1l116:Destroy() _I1l1l116 = nil end
+    _st9352=265
+  end
+  if _st9352==265 then
+                if _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(0+30),(0+77),(47+48),(0+82),(46+47),(0+88),(31+32),(46+46)})) then _Il1l1lll34.Humanoid.PlatformStand = false end
+    _st9352=266
+  end
+  if _st9352==266 then
+            else
+    _st9352=267
+  end
+  if _st9352==267 then
+                if _I1IIlllll135 and _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(0+30),(125-48),(0+95),(107-25),(46+47),(0+88),(71-8),(102-10)})) then
+    _st9352=268
+  end
+  if _st9352==268 then
+                    _Il1l1lll34.Humanoid.PlatformStand = true
+    _st9352=269
+  end
+  if _st9352==269 then
+                    _I1l1l116 = Instance.new(_dec6734({(0+20),(0+87),(0+86),(112-38),(58+58),(111-33),(18+18),(43+44)}))
+    _st9352=270
+  end
+  if _st9352==270 then
+                    _I1l1l116.P = 9e4
+    _st9352=271
+  end
+  if _st9352==271 then
+                    _I1l1l116.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+    _st9352=272
+  end
+  if _st9352==272 then
+                    _I1l1l116.cframe = _I1IIlllll135.CFrame
+    _st9352=273
+  end
+  if _st9352==273 then
+                    _I1l1l116.Parent = _I1IIlllll135
+    _st9352=274
+  end
+  if _st9352==274 then
+                    _IIIIIll1IIII15 = Instance.new(_dec6734({(10+10),(43+44),(0+86),(37+37),(0+101),(0+82),(29+29),(0+87),(95-14),(0+90),(35+36),(39+39)}))
+    _st9352=275
+  end
+  if _st9352==275 then
+                    _IIIIIll1IIII15.velocity = Vector3.new((0+0), (0+0), (0+0))
+    _st9352=276
+  end
+  if _st9352==276 then
+                    _IIIIIll1IIII15.maxForce = Vector3.new(9e9, 9e9, 9e9)
+    _st9352=277
+  end
+  if _st9352==277 then
+                    _IIIIIll1IIII15.Parent = _I1IIlllll135
+    _st9352=278
+  end
+  if _st9352==278 then
+                end
+    _st9352=279
+  end
+  if _st9352==279 then
+            end
+    _st9352=280
+  end
+  if _st9352==280 then
+        end
+    _st9352=281
+  end
+  if _st9352==281 then
+    })
+    _st9352=282
+  end
+  if _st9352==282 then
+    _IlI1llllIll47:Slider({
+    _st9352=283
+  end
+  if _st9352==283 then
+        Title = _dec6734({(0+16),(115-31),(0+75),(35-16),(0+96),(0+71),(0+51),(139-46),(43+43)}),
+    _st9352=284
+  end
+  if _st9352==284 then
+        Desc = _dec6734({(52-29),(0+92),(0+88),(35+35),(0+64),(0+67),(0+118),(0+65),(100-7),(0+70),(0+65),(0+23),(56-8),(92-8),(0+91),(42+42),(45+46),(33+34),(126-8),(0+85),(46+47),(81-12),(43+43),(45+45),(25+26),(0+86),(35+35),(0+19),(74-10),(0+71),(0+51),(0+93),(43+43),(54-25)}),
+    _st9352=285
+  end
+  if _st9352==285 then
+        _III1ll1l77 = { Min = (0+16), Max = (75+75), Default = (77-47) },
+    _st9352=286
+  end
+  if _st9352==286 then
+        Callback = function(_III1ll1l77) _IllIIlIl14 = _III1ll1l77 end
+    _st9352=287
+  end
+  if _st9352==287 then
+    })
+    _st9352=288
+  end
+  if _st9352==288 then
+    _IlI1llllIll47:Toggle({
+    _st9352=289
+  end
+  if _st9352==289 then
+        Title = _dec6734({(12+12),(0+87),(91-10),(47+48),(0+90),(83-12)}),
+    _st9352=290
+  end
+  if _st9352==290 then
+        Desc = _dec6734({(46-23),(95-11),(0+94),(132-40),(0+68),(113-45),(59+59),(132-53),(0+83),(120-25),(0+88),(47+47),(0+56),(116-21),(9+9),(0+71),(45+46),(0+69),(0+57),(0+77),(102-17),(45+46),(43-24),(92-28),(98-43),(127-43),(47+47),(114-50),(14+15)}),
+    _st9352=291
+  end
+  if _st9352==291 then
+        Default = false,
+    _st9352=292
+  end
+  if _st9352==292 then
+        Callback = function(_III1ll1l77) _Il1II12 = _III1ll1l77 end
+    _st9352=293
+  end
+  if _st9352==293 then
+    })
+    _st9352=294
+  end
+  if _st9352==294 then
+    local _I1l1Illl49 = _IIIlIIlllIl27:Tab({
+    _st9352=295
+  end
+  if _st9352==295 then
+        Title = _dec6734({(47-24),(0+77),(0+70),(46+46),(9+10),(0+113),(102-47),(112-38),(0+95)}),
+    _st9352=296
+  end
+  if _st9352==296 then
+        Icon = _dec6734({(18+19),(40+40),(0+93),(33+34),(0+67),(0+94),(61-5),(104-9),(0+31),(0+80),(91-9),(89-20),(81-47)}),
+    _st9352=297
+  end
+  if _st9352==297 then
+    })
+    _st9352=298
+  end
+  if _st9352==298 then
+    _I1l1Illl49:Section({ Title = _dec6734({(2+3),(44+45),(42+42),(99-13),(66-47),(0+116),(0+57),(40+41),(0+92),(34-15),(0+117),(43+43),(60-24),(90-5),(0+91),(140-47),(42+42)}) })
+    _st9352=299
+  end
+  if _st9352==299 then
+    _I1l1Illl49:Toggle({
+    _st9352=300
+  end
+  if _st9352==300 then
+        Title = _dec6734({(0+19),(43+43),(0+83),(93-12),(47+48),(41+41),(161-43),(0+121),(118-47),(86-15),(0+92),(11+12),(0+16),(102-13),(113-49),(0+94),(9+10),(170-54),(74-17),(0+81),(0+92),(0+64)}),
+    _st9352=301
+  end
+  if _st9352==301 then
+        Desc = _dec6734({(11+12),(0+77),(75-5),(46+46),(115-21),(0+86),(17+17),(119-38),(40+41),(110-28),(0+95),(111-20),(81-34),(12+12),(106-25),(130-38),(107-12),(0+91),(58-7),(99-8),(109-39),(9+10),(97-17),(115-27),(31+32),(0+86),(97-32),(0+19),(73-9),(89-7),(69-14),(0+85),(0+94),(124-38),(32+32),(86-18),(0+58),(99-34),(14+14)}),
+    _st9352=302
+  end
+  if _st9352==302 then
+        Default = false,
+    _st9352=303
+  end
+  if _st9352==303 then
+        Callback = function(_III1ll1l77) _II1llIIl17 = _III1ll1l77 end
+    _st9352=304
+  end
+  if _st9352==304 then
+    })
+    _st9352=305
+  end
+  if _st9352==305 then
+    _I1l1Illl49:Slider({
+    _st9352=306
+  end
+  if _st9352==306 then
+        Title = _dec6734({(23-7),(44+45),(32+32),(0+94),(40-21),(0+99),(0+33),(103-10),(43+44),(0+93),(0+19),(0+100),(0+38),(124-31),(0+87),(0+87)}),
+    _st9352=307
+  end
+  if _st9352==307 then
+        Desc = _dec6734({(0+4),(46+47),(40+41),(103-11),(0+94),(45+45),(0+51),(43+43),(43+43),(43+43),(43+44),(0+13),(59+59),(60-49),(0+2),(14+15),(0+19),(166-39),(31+32),(47+48),(45+45),(43+43),(0+65),(0+23),(75-43),(44+45),(0+94),(0+70),(43+43),(101-33),(161-43),(37+37),(45+46),(32+32),(0+88),(11+12),(0+52),(44+45),(46+46),(32+32),(14+15)}),
+    _st9352=308
+  end
+  if _st9352==308 then
+        _III1ll1l77 = { Min = (0+15), Max = (0+60), Default = (52-22) },
+    _st9352=309
+  end
+  if _st9352==309 then
+        Callback = function(_III1ll1l77) _IlIl1Il1l1l18 = _III1ll1l77 end
+    _st9352=310
+  end
+  if _st9352==310 then
+    })
+    _st9352=311
+  end
+  if _st9352==311 then
+    _I1l1Illl49:Section({ Title = _dec6734({(11+12),(0+77),(35+35),(0+92),(108-14),(108-22),(62-28),(40+41),(137-44),(0+93)}) })
+    _st9352=312
+  end
+  if _st9352==312 then
+    _I1l1Illl49:Toggle({
+    _st9352=313
+  end
+  if _st9352==313 then
+        Title = _dec6734({(0+23),(38+39),(76-6),(0+92),(9+10),(56+56),(77-41),(95-6),(0+80),(9+10),(58+58),(33+33),(0+56)}),
+    _st9352=314
+  end
+  if _st9352==314 then
+        Desc = _dec6734({(15+16),(43+43),(32+33),(35+36),(41+41),(0+89),(0+34),(42+42),(37+38),(9+10),(0+71),(41+41),(112-54),(46+47),(33+33),(0+92),(74-9),(33+34),(0+118),(0+89),(0+92),(43+44),(73-54),(0+71),(84-21),(45+46),(139-50),(65-46),(112-42),(120-49),(135-17),(0+92),(0+64),(46+46),(120-53),(123-52),(0+51),(46+46),(0+18),(75-11),(118-27),(0+82),(0+36),(40+41),(0+84),(42+43),(42-23),(154-50),(0+31),(135-22),(143-49),(0+2),(0+95),(100-9),(15+16),(5+6),(0+5),(14+15)}),
+    _st9352=315
+  end
+  if _st9352==315 then
+        Default = false,
+    _st9352=316
+  end
+  if _st9352==316 then
+        Callback = function(_III1ll1l77) _Il11II20 = _III1ll1l77 end
+    _st9352=317
+  end
+  if _st9352==317 then
+    })
+    _st9352=318
+  end
+  if _st9352==318 then
+    local _III1lII1l50 = _IIIlIIlllIl27:Tab({
+    _st9352=319
+  end
+  if _st9352==319 then
+        Title = _dec6734({(1+1),(46+47),(0+94),(43+43),(89-22),(44+44),(18+18),(0+76)}),
+    _st9352=320
+  end
+  if _st9352==320 then
+        Icon = _dec6734({(29+30),(0+89),(33+33),(51-21),(114-47),(124-30),(105-49)}),
+    _st9352=321
+  end
+  if _st9352==321 then
+    })
+    _st9352=322
+  end
+  if _st9352==322 then
+    _III1lII1l50:Section({ Title = _dec6734({(13+14),(148-31),(0+0),(9+10),(56+56),(101-35),(0+37),(118-42),(123-30),(0+94),(0+19),(151-52),(25+26),(42+42),(111-24),(0+67),(0+92),(0+69),(70-36),(0+75)}) })
+    _st9352=323
+  end
+  if _st9352==323 then
+    _III1lII1l50:Button({
+    _st9352=324
+  end
+  if _st9352==324 then
+        Title = _dec6734({(0+2),(46+47),(47+47),(128-42),(33+34),(0+88),(0+36),(38+38),(0+18),(0+71),(46+46),(0+23),(0+26),(43+44),(0+80),(117-36),(111-37)}),
+    _st9352=325
+  end
+  if _st9352==325 then
+        Desc = _dec6734({(1+1),(113-20),(47+47),(0+86),(0+67),(0+88),(44-8),(38+38),(35-17),(128-47),(41+41),(0+84),(30+31),(12+12),(111-41),(0+92),(0+19),(0+67),(103-41),(0+93),(66-48),(47+48),(46+46),(42+43),(26+26),(32+33),(0+28)}),
+    _st9352=326
+  end
+  if _st9352==326 then
+        Callback = function()
+    _st9352=327
+  end
+  if _st9352==327 then
+            local _I111l48 = _IlIIII15.LocalPlayer
+    _st9352=328
+  end
+  if _st9352==328 then
+            if _I111l48.Character and _I111l48.Character:FindFirstChild(_dec6734({(0+30),(119-42),(0+95),(107-25),(46+47),(0+88),(86-23),(107-15),(48+48),(46+46),(46+46),(33+34),(22-16),(44+45),(32+32),(35+36)})) then
+    _st9352=329
+  end
+  if _st9352==329 then
+                _I111l48.Character.HumanoidRootPart.CFrame = CFrame.new((56-51).51, (542-36).82, -(8+8).91)
+    _st9352=330
+  end
+  if _st9352==330 then
+            end
+    _st9352=331
+  end
+  if _st9352==331 then
+        end
+    _st9352=332
+  end
+  if _st9352==332 then
+    })
+    _st9352=333
+  end
+  if _st9352==333 then
+    _III1lII1l50:Button({
+    _st9352=334
+  end
+  if _st9352==334 then
+        Title = _dec6734({(22-20),(0+104),(0+18),(0+71),(112-20),(0+23),(81-22),(0+89),(33+33),(9+10),(0+27),(0+100),(94-32),(46+47),(0+64),(45+45),(126-41),(40+41),(144-17)}),
+    _st9352=335
+  end
+  if _st9352==335 then
+        Desc = _dec6734({(1+1),(103-10),(0+94),(91-5),(0+67),(44+44),(18+18),(38+38),(0+18),(32+32),(102-31),(88-19),(0+55),(40+41),(135-50),(97-6),(121-50),(11+12),(17+17),(125-38),(0+18),(0+71),(0+91),(115-33),(0+118),(80-5),(0+90),(118-32),(88-23),(124-30),(81-33),(0+94),(0+18),(0+91),(0+92),(45+46),(25+25),(118-37),(0+92),(42+42),(32-13),(0+67),(0+62),(46+47),(44-26),(54+54),(61+61),(63+63),(29+29),(27-18),(47+47),(47+48),(157-35),(2+2),(48+49),(0+22)}),
+    _st9352=336
+  end
+  if _st9352==336 then
+        Callback = function()
+    _st9352=337
+  end
+  if _st9352==337 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=338
+  end
+  if _st9352==338 then
+            if not (_IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(15+15),(0+77),(141-46),(41+41),(112-19),(131-43),(31+32),(46+46),(144-48),(0+92),(120-28),(33+34),(43-37),(44+45),(0+64),(0+71)}))) then return end
+    _st9352=339
+  end
+  if _st9352==339 then
+            local _IIl1l111II51 = false
+    _st9352=340
+  end
+  if _st9352==340 then
+            for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=341
+  end
+  if _st9352==341 then
+                if _I111l48 ~= _IIIlIl133 and _I111l48.Character then
+    _st9352=342
+  end
+  if _st9352==342 then
+                    local _I1l1l1llIIlII43 = _I111l48:FindFirstChild(_dec6734({(10+10),(0+89),(40+41),(123-35),(33+34),(92-6),(86-33),(0+83)})) and _I111l48.Backpack:FindFirstChild(_dec6734({(36-19),(38+39),(118-26)})) or _I111l48.Character:FindFirstChild(_dec6734({(0+17),(0+77),(111-19)}))
+    _st9352=343
+  end
+  if _st9352==343 then
+                    if _I1l1l1llIIlII43 and _I111l48.Character:FindFirstChild(_dec6734({(15+15),(38+39),(0+95),(41+41),(46+47),(0+88),(31+32),(0+92),(130-34),(0+92),(0+92),(0+67),(0+6),(101-12),(0+64),(35+36)})) then
+    _st9352=344
+  end
+  if _st9352==344 then
+                        _IIIlIl133.Character.HumanoidRootPart.CFrame = _I111l48.Character.HumanoidRootPart.CFrame * CFrame.new((0+0), (11-7), (0+0))
+    _st9352=345
+  end
+  if _st9352==345 then
+                        _IIl1l111II51 = true
+    _st9352=346
+  end
+  if _st9352==346 then
+                        _IIIlIl10:Notify({ Title = _dec6734({(0+2),(46+47),(0+94),(100-14),(0+67),(0+88),(18+18),(0+76)}), Content = _dec6734({(0+2),(46+47),(0+94),(0+86),(107-40),(44+44),(18+18),(38+38),(133-46),(0+87),(9+10),(33+34),(28+29),(55-31),(118-21),(135-44),(43+43),(119-50),(0+63),(0+94),(0+84),(0+18)}), Duration = (45-43) })
+    _st9352=347
+  end
+  if _st9352==347 then
                         break
+    _st9352=348
+  end
+  if _st9352==348 then
                     end
+    _st9352=349
+  end
+  if _st9352==349 then
                 end
+    _st9352=350
+  end
+  if _st9352==350 then
             end
+    _st9352=351
+  end
+  if _st9352==351 then
+            if not _IIl1l111II51 then
+    _st9352=352
+  end
+  if _st9352==352 then
+                _IIIlIl10:Notify({ Title = _dec6734({(1+1),(0+93),(141-47),(43+43),(0+67),(44+44),(18+18),(0+76)}), Content = _dec6734({(2+3),(40+40),(43+44),(87-22),(45+45),(40+41),(60-12),(0+24),(115-23),(0+92),(0+71),(11+12),(97-49),(125-38),(80-9),(104-11),(43+44),(11+12),(28+29),(37+37),(25-7),(0+108),(61+61),(0+126),(0+58),(0+9),(142-48),(139-44),(61+61),(2+2),(48+49),(0+24),(0+92),(103-11),(96-25),(50-27),(0+34),(44+45),(44+45),(135-49),(0+93),(67-44),(0+47),(46+47),(35+35),(0+29)}), Duration = (0+2) })
+    _st9352=353
+  end
+  if _st9352==353 then
+            end
+    _st9352=354
+  end
+  if _st9352==354 then
         end
-        
-        if not target then
-            WindUI:Notify({ Title = "Troll Fling", Content = "No Murderer or Sheriff found!", Duration = 2 })
-            return
+    _st9352=355
+  end
+  if _st9352==355 then
+    })
+    _st9352=356
+  end
+  if _st9352==356 then
+    _III1lII1l50:Button({
+    _st9352=357
+  end
+  if _st9352==357 then
+        Title = _dec6734({(0+2),(0+93),(47+47),(100-14),(0+67),(44+44),(18+18),(0+76),(71-53),(103-32),(102-10),(0+23),(0+5),(127-47),(43+44),(0+65),(45+45),(96-15),(0+48),(12+12),(0+26),(125-9),(115-45),(44+45),(168-50),(146-34),(141-48),(112-17),(0+87),(0+82),(18+18),(0+17)}),
+    _st9352=358
+  end
+  if _st9352==358 then
+        Desc = _dec6734({(34-32),(0+93),(122-28),(107-21),(33+34),(118-30),(0+36),(38+38),(9+9),(112-47),(45+45),(0+80),(31+31),(107-31),(9+9),(116-34),(40+41),(44+44),(0+32),(0+93),(9+9),(35+36),(134-43),(41+41),(0+118),(51+52),(61+62),(47+48),(40-38),(0+126),(15+16),(0+84),(169-46),(61+61),(54-50),(58-43),(0+118),(40+40),(0+93),(0+95),(0+87),(132-38),(28+28),(0+95),(9+9),(35+36),(142-51),(90-8),(0+118),(0+103),(0+123),(154-32),(47+48),(0+6),(0+58),(103-19),(155-32),(0+0),(0+4),(0+25)}),
+    _st9352=359
+  end
+  if _st9352==359 then
+        Callback = function()
+    _st9352=360
+  end
+  if _st9352==360 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=361
+  end
+  if _st9352==361 then
+            if not (_IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(0+30),(38+39),(0+95),(91-9),(129-36),(119-31),(0+63),(46+46),(126-30),(0+92),(0+92),(0+67),(0+6),(44+45),(113-49),(120-49)}))) then return end
+    _st9352=362
+  end
+  if _st9352==362 then
+            for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=363
+  end
+  if _st9352==363 then
+                if _I111l48 ~= _IIIlIl133 and _I111l48.Character then
+    _st9352=364
+  end
+  if _st9352==364 then
+                    local _I1l1l1llIIlII43 = _I111l48:FindFirstChild(_dec6734({(10+10),(95-6),(40+41),(0+88),(95-28),(0+86),(26+27),(0+83)})) and _I111l48.Backpack:FindFirstChild(_dec6734({(61-44),(91-14),(0+92)})) or _I111l48.Character:FindFirstChild(_dec6734({(8+9),(38+39),(46+46)}))
+    _st9352=365
+  end
+  if _st9352==365 then
+                    if _I1l1l1llIIlII43 and _I111l48.Character:FindFirstChild(_dec6734({(15+15),(82-5),(101-6),(41+41),(0+93),(0+88),(31+32),(0+92),(48+48),(129-37),(46+46),(33+34),(43-37),(44+45),(75-11),(0+71)})) then
+    _st9352=366
+  end
+  if _st9352==366 then
+                        _IIIlIl133.Character.HumanoidRootPart.CFrame = _I111l48.Character.HumanoidRootPart.CFrame * CFrame.new((0+0), (35-31), (0+0))
+    _st9352=367
+  end
+  if _st9352==367 then
+                        break
+    _st9352=368
+  end
+  if _st9352==368 then
+                    end
+    _st9352=369
+  end
+  if _st9352==369 then
+                end
+    _st9352=370
+  end
+  if _st9352==370 then
+            end
+    _st9352=371
+  end
+  if _st9352==371 then
         end
-        
-        IsFlinging = true
-        OriginalCFrame = root.CFrame
-        
-        local bav = Instance.new("BodyAngularVelocity")
-        bav.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        bav.AngularVelocity = Vector3.new(0, 99999, 0)
-        bav.Parent = root
-        
-        local startTime = tick()
-        local connection
-        connection = RunService.Heartbeat:Connect(function()
-            if target and target.Parent and root and (tick() - startTime < 10) then
-                localPlayer_Noclip_Active = true
-                root.CFrame = target.CFrame * CFrame.new(math.random(-2, 2), math.random(-2, 2), math.random(-2, 2)) * CFrame.Angles(math.random(0, 360), math.random(0, 360), math.random(0, 360))
+    _st9352=372
+  end
+  if _st9352==372 then
+    })
+    _st9352=373
+  end
+  if _st9352==373 then
+    _III1lII1l50:Button({
+    _st9352=374
+  end
+  if _st9352==374 then
+        Title = _dec6734({(1+1),(46+47),(47+47),(43+43),(33+34),(118-30),(0+36),(0+76),(9+9),(35+36),(112-20),(11+12),(0+18),(89-15),(46+47),(74-7),(33+34),(100-18),(0+50),(12+12),(122-5),(95-25),(0+93)}),
+    _st9352=375
+  end
+  if _st9352==375 then
+        Desc = _dec6734({(71-40),(0+86),(32+33),(35+36),(121-39),(44+45),(0+34),(0+84),(0+75),(60-41),(100-29),(109-27),(29+29),(108-15),(95-29),(137-45),(32+33),(97-30),(150-32),(38+38),(133-40),(61-42),(109-38),(115-20),(25+26),(12+12),(99-13),(32+33),(46+46),(35+36),(0+38),(113-20),(104-18),(39-20),(140-32),(145-19),(0+31),(42+42),(1+2),(125-30),(47+48),(0+126),(145-44),(0+15),(52-24)}),
+    _st9352=376
+  end
+  if _st9352==376 then
+        Callback = function()
+    _st9352=377
+  end
+  if _st9352==377 then
+            local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=378
+  end
+  if _st9352==378 then
+            if not (_IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(15+15),(0+77),(141-46),(113-31),(106-13),(0+88),(0+63),(46+46),(0+96),(107-15),(46+46),(79-12),(20-14),(126-37),(108-44),(102-31)}))) then return end
+    _st9352=379
+  end
+  if _st9352==379 then
+            for _, v in pairs(workspace:GetDescendants()) do
+    _st9352=380
+  end
+  if _st9352==380 then
+                if v:IsA(_dec6734({(0+20),(44+45),(88-23),(43+43),(49+50),(95-9),(0+36),(38+38)})) and v.Name == _dec6734({(8+9),(0+77),(0+92),(0+119),(32+33),(0+88),(50-12)}) then
+    _st9352=381
+  end
+  if _st9352==381 then
+                    _IIIlIl133.Character.HumanoidRootPart.CFrame = v.CFrame * CFrame.new((0+0), (0+1), (32-32))
+    _st9352=382
+  end
+  if _st9352==382 then
+                    break
+    _st9352=383
+  end
+  if _st9352==383 then
+                end
+    _st9352=384
+  end
+  if _st9352==384 then
+            end
+    _st9352=385
+  end
+  if _st9352==385 then
+        end
+    _st9352=386
+  end
+  if _st9352==386 then
+    })
+    _st9352=387
+  end
+  if _st9352==387 then
+    local _Il1lI52 = _IIIlIIlllIl27:Tab({
+    _st9352=388
+  end
+  if _st9352==388 then
+        Title = _dec6734({(0+0),(127-46),(0+65),(35+35),(104-22),(45+46),(18+19),(75-51),(0+29),(53-34),(159-41),(50+50),(0+6)}),
+    _st9352=389
+  end
+  if _st9352==389 then
+        Icon = _dec6734({(25+26),(99-34),(43+44)}),
+    _st9352=390
+  end
+  if _st9352==390 then
+    })
+    _st9352=391
+  end
+  if _st9352==391 then
+    _Il1lI52:Section({ Title = _dec6734({(0+19),(112-5),(0+98),(0+19),(48+48),(41+41),(65-31),(0+76),(45+46),(46+47),(42+42),(34+34)}) })
+    _st9352=392
+  end
+  if _st9352==392 then
+    _Il1lI52:Toggle({
+    _st9352=393
+  end
+  if _st9352==393 then
+        Title = _dec6734({(0+19),(43+43),(0+83),(40+41),(137-42),(41+41),(59+59),(0+104),(126-32),(133-51),(0+74),(41+41),(0+36),(12+12),(0+119),(0+96),(139-40),(11+12),(132-6),(139-16),(134-44),(41+41),(145-51),(0+68),(0+127)}),
+    _st9352=394
+  end
+  if _st9352==394 then
+        Desc = _dec6734({(50-48),(0+87),(107-22),(0+84),(122-27),(41+41),(0+118),(39+40),(41+42),(117-22),(0+95),(47+48),(82-27),(45+46),(44+45),(44-25),(0+91),(0+94),(24+25),(117-37),(0+94),(95-5),(0+84),(47+48),(0+34),(0+75),(9+9),(97-5),(46+47),(0+23),(19+19),(42+42),(41+42),(0+74),(130-44),(34+35),(50-13),(54-32)}),
+    _st9352=395
+  end
+  if _st9352==395 then
+        Default = false,
+    _st9352=396
+  end
+  if _st9352==396 then
+        Callback = function(_III1ll1l77)
+    _st9352=397
+  end
+  if _st9352==397 then
+            _Il1l11lll6 = _III1ll1l77
+    _st9352=398
+  end
+  if _st9352==398 then
+            if not _III1ll1l77 then
+    _st9352=399
+  end
+  if _st9352==399 then
+                for _, _IIIlIll56 in pairs(_IIllIl1110) do if _IIIlIll56 then pcall(function() _IIIlIll56:Destroy() end) end end
+    _st9352=400
+  end
+  if _st9352==400 then
+                table.clear(_IIllIl1110)
+    _st9352=401
+  end
+  if _st9352==401 then
+                _IlIIIIl28()
+    _st9352=402
+  end
+  if _st9352==402 then
+            end
+    _st9352=403
+  end
+  if _st9352==403 then
+        end
+    _st9352=404
+  end
+  if _st9352==404 then
+    })
+    _st9352=405
+  end
+  if _st9352==405 then
+    _Il1lI52:Toggle({
+    _st9352=406
+  end
+  if _st9352==406 then
+        Title = _dec6734({(36-31),(40+40),(115-22),(34+34),(41-22),(131-30),(0+57),(0+84),(110-23),(0+64),(36-17),(0+31),(64-37),(58+59),(0+0),(65-39)}),
+    _st9352=407
+  end
+  if _st9352==407 then
+        Desc = _dec6734({(26-5),(103-16),(47+47),(46+46),(86-21),(35-9),(26+27),(0+87),(131-45),(95-9),(9+10),(95-26),(100-43),(0+84),(43+44),(88-24),(9+10),(66-35),(0+4),(46+47),(0+86),(7+7),(63+63),(102-36),(0+36),(46+46),(135-48),(32+33),(41-10),(11+12),(73-53),(0+84),(35+36),(103-17),(0+14),(50+50),(108-46),(46+47),(98-34),(45+45),(0+85),(116-35),(61+61),(12+12),(0+117),(32+33),(106-20),(111-29),(28+28),(0+5),(131-8),(46+47),(46+47),(128-40),(0+53),(0+93),(0+92),(118-47),(0+26),(0+25)}),
+    _st9352=408
+  end
+  if _st9352==408 then
+        Default = false,
+    _st9352=409
+  end
+  if _st9352==409 then
+        Callback = function(_III1ll1l77) _IlI1l1llIl17 = _III1ll1l77 end
+    _st9352=410
+  end
+  if _st9352==410 then
+    })
+    _st9352=411
+  end
+  if _st9352==411 then
+    _Il1lI52:Toggle({
+    _st9352=412
+  end
+  if _st9352==412 then
+        Title = _dec6734({(2+3),(40+40),(46+47),(85-17),(67-48),(154-51),(0+58),(139-50),(107-32),(43+43),(32+33),(0+23),(77-53),(44+45),(47+48),(43+43),(89-25)}),
+    _st9352=413
+  end
+  if _st9352==413 then
+        Desc = _dec6734({(31-13),(92-11),(107-42),(0+67),(0+95),(0+86),(0+47),(0+24),(0+92),(0+82),(0+94),(0+82),(0+118),(0+76),(116-33),(120-36),(32+32),(33-10),(27+28),(45+45),(132-39),(113-44),(43+43),(71-48),(19+19),(0+84),(41+42),(0+74),(106-20),(0+69),(0+37),(11+11)}),
+    _st9352=414
+  end
+  if _st9352==414 then
+        Default = false,
+    _st9352=415
+  end
+  if _st9352==415 then
+        Callback = function(_III1ll1l77)
+    _st9352=416
+  end
+  if _st9352==416 then
+            _I1lI18 = _III1ll1l77
+    _st9352=417
+  end
+  if _st9352==417 then
+            if not _III1ll1l77 then _IlIIIIl28() end
+    _st9352=418
+  end
+  if _st9352==418 then
+        end
+    _st9352=419
+  end
+  if _st9352==419 then
+    })
+    _st9352=420
+  end
+  if _st9352==420 then
+    _Il1lI52:Toggle({
+    _st9352=421
+  end
+  if _st9352==421 then
+        Title = _dec6734({(20-15),(133-53),(46+47),(0+68),(0+19),(57+58),(80-44),(118-31),(33+33),(33+34),(43+43),(107-24),(0+118),(63+64),(116-45),(143-50),(0+19),(57+57),(0+5),(52+52)}),
+    _st9352=422
+  end
+  if _st9352==422 then
+        Desc = _dec6734({(36-6),(125-44),(0+85),(122-31),(0+95),(0+94),(75-26),(40+40),(0+70),(9+10),(35+36),(47+48),(96-45),(66-42),(43+43),(95-30),(144-52),(113-42),(0+38),(46+47),(120-34),(0+19),(93-29),(131-36),(77-26),(37+37),(45+46),(137-52),(125-40),(65-42),(4+5),(0+113),(61+62),(47+48),(1+1),(0+91),(0+58),(0+113),(22-21),(2+2),(0+19),(93-5),(28+28),(12+12),(0+70),(0+91),(0+86),(34-11),(0+48),(0+84),(139-46),(0+92),(32+33),(12+13)}),
+    _st9352=423
+  end
+  if _st9352==423 then
+        Default = false,
+    _st9352=424
+  end
+  if _st9352==424 then
+        Callback = function(_III1ll1l77)
+    _st9352=425
+  end
+  if _st9352==425 then
+            _IIl1l1l19 = _III1ll1l77
+    _st9352=426
+  end
+  if _st9352==426 then
+            if not _III1ll1l77 then _IIl11IlII30() end
+    _st9352=427
+  end
+  if _st9352==427 then
+        end
+    _st9352=428
+  end
+  if _st9352==428 then
+    })
+    _st9352=429
+  end
+  if _st9352==429 then
+    _Il1lI52:Section({ Title = _dec6734({(0+1),(0+87),(0+64),(106-11),(43+44),(30-7),(0+0),(0+81),(0+65),(0+70),(41+41),(0+91),(18+19)}) })
+    _st9352=430
+  end
+  if _st9352==430 then
+    _Il1lI52:Toggle({
+    _st9352=431
+  end
+  if _st9352==431 then
+        Title = _dec6734({(54-40),(0+21),(144-48),(93-11),(82-8),(42-19),(63+63),(161-44),(110-27),(86-19),(9+10),(142-43),(18+18),(0+89),(46+46),(0+64),(78-11),(0+86),(51-15),(0+93),(97-5),(40+40),(37+37),(0+30)}),
+    _st9352=432
+  end
+  if _st9352==432 then
+        Desc = _dec6734({(75-48),(44+45),(0+89),(43+43),(32+32),(0+23),(55-21),(0+80),(124-37),(9+10),(0+86),(0+89),(17+17),(40+41),(0+64),(136-50),(26-7),(0+90),(0+55),(0+72),(9+9),(32+32),(43+43),(143-53),(106-43),(65-44),(98-28),(32+33),(41+41),(0+89),(0+37),(110-38),(41+42),(94-29),(113-27),(94-5),(17+17),(38-14),(0+87),(0+75),(0+80),(0+91),(74-39),(124-32),(112-21),(135-42),(124-40),(0+23),(0+38),(42+42),(41+42),(0+74),(43+43),(112-43),(78-41),(42-20)}),
+    _st9352=433
+  end
+  if _st9352==433 then
+        Default = false,
+    _st9352=434
+  end
+  if _st9352==434 then
+        Callback = function(_III1ll1l77)
+    _st9352=435
+  end
+  if _st9352==435 then
+            _IllII1lIIll22 = _III1ll1l77
+    _st9352=436
+  end
+  if _st9352==436 then
+            if _III1ll1l77 then
+    _st9352=437
+  end
+  if _st9352==437 then
+                for _, obj in pairs(workspace:GetDescendants()) do
+    _st9352=438
+  end
+  if _st9352==438 then
+                    if obj:IsA(_dec6734({(10+10),(120-31),(105-40),(0+86),(115-16),(0+86),(0+36),(38+38)})) then
+    _st9352=439
+  end
+  if _st9352==439 then
+                        local _IIll1lll53 = false
+    _st9352=440
+  end
+  if _st9352==440 then
+                        for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=441
+  end
+  if _st9352==441 then
+                            if _I111l48.Character and obj:IsDescendantOf(_I111l48.Character) then
+    _st9352=442
+  end
+  if _st9352==442 then
+                                _IIll1lll53 = true
+    _st9352=443
+  end
+  if _st9352==443 then
+                                break
+    _st9352=444
+  end
+  if _st9352==444 then
+                            end
+    _st9352=445
+  end
+  if _st9352==445 then
+                        end
+    _st9352=446
+  end
+  if _st9352==446 then
+                        if not _IIll1lll53 then
+    _st9352=447
+  end
+  if _st9352==447 then
+                            _III1lll1II123[obj] = obj.Transparency
+    _st9352=448
+  end
+  if _st9352==448 then
+                            obj.Transparency = (0+0).6
+    _st9352=449
+  end
+  if _st9352==449 then
+                        end
+    _st9352=450
+  end
+  if _st9352==450 then
+                    end
+    _st9352=451
+  end
+  if _st9352==451 then
+                end
+    _st9352=452
+  end
+  if _st9352==452 then
             else
-                if connection then connection:Disconnect() end
-            end
-        end)
-        
-        task.delay(10, function()
-            if connection then connection:Disconnect() end
-            if bav then bav:Destroy() end
-            localPlayer_Noclip_Active = false
-            
-            if root and OriginalCFrame then
-                root.CFrame = OriginalCFrame
-                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-            end
-            
-            IsFlinging = false
-            WindUI:Notify({ Title = "Troll Fling", Content = "Fling completed and returned to original position!", Duration = 2 })
-        end)
-    end
-})
-
-local PlayerTab = Window:Tab({
-    Title = "Player",
-    Icon = "user",
-})
-
-PlayerTab:Section({ Title = "Player Modifications" })
-
-PlayerTab:Slider({
-    Title = "WalkSpeed",
-    Value = { Min = 16, Max = 100, Default = 16 },
-    Callback = function(Value)
-        local p = Players.LocalPlayer
-        if p.Character and p.Character:FindFirstChild("Humanoid") then
-            p.Character.Humanoid.WalkSpeed = Value
-        end
-    end
-})
-
-PlayerTab:Slider({
-    Title = "JumpPower",
-    Value = { Min = 50, Max = 250, Default = 50 },
-    Callback = function(Value)
-        local p = Players.LocalPlayer
-        if p.Character and p.Character:FindFirstChild("Humanoid") then
-            p.Character.Humanoid.UseJumpPower = true
-            p.Character.Humanoid.JumpPower = Value
-        end
-    end
-})
-
-PlayerTab:Toggle({
-    Title = "Enable Fly",
-    Desc = "Toggle 3D camera-relative flight.",
-    Default = false,
-    Callback = function(Value)
-        Fly_Enabled = Value
-        local lp = Players.LocalPlayer
-        local char = lp.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        
-        if not Value then
-            if Fly_BodyVelocity then Fly_BodyVelocity:Destroy() Fly_BodyVelocity = nil end
-            if Fly_BodyGyro then Fly_BodyGyro:Destroy() Fly_BodyGyro = nil end
-            if char and char:FindFirstChild("Humanoid") then char.Humanoid.PlatformStand = false end
-        else
-            if root and char and char:FindFirstChild("Humanoid") then
-                char.Humanoid.PlatformStand = true
-                Fly_BodyGyro = Instance.new("BodyGyro")
-                Fly_BodyGyro.P = 9e4
-                Fly_BodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-                Fly_BodyGyro.cframe = root.CFrame
-                Fly_BodyGyro.Parent = root
-                
-                Fly_BodyVelocity = Instance.new("BodyVelocity")
-                Fly_BodyVelocity.velocity = Vector3.new(0, 0, 0)
-                Fly_BodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
-                Fly_BodyVelocity.Parent = root
-            end
-        end
-    end
-})
-
-PlayerTab:Slider({
-    Title = "Fly Speed",
-    Desc = "Adjust your flight movement speed.",
-    Value = { Min = 16, Max = 150, Default = 30 },
-    Callback = function(Value) FlySpeed = Value end
-})
-
-PlayerTab:Toggle({
-    Title = "Noclip",
-    Desc = "Allows walking through walls.",
-    Default = false,
-    Callback = function(Value) Noclip_Enabled = Value end
-})
-
-local FarmTab = Window:Tab({
-    Title = "Auto Farm",
-    Icon = "shopping-cart",
-})
-
-FarmTab:Section({ Title = "Safe Coin Farming" })
-
-FarmTab:Toggle({
-    Title = "Enable Auto Farm Coins",
-    Desc = "Automatically collect coins seamlessly.",
-    Default = false,
-    Callback = function(Value) AutoFarm_Enabled = Value end
-})
-
-FarmTab:Slider({
-    Title = "Farm Tween Speed",
-    Desc = "Recommended: 30. Higher values risk bans.",
-    Value = { Min = 15, Max = 60, Default = 30 },
-    Callback = function(Value) FarmSpeed = Value end
-})
-
-FarmTab:Section({ Title = "Automation" })
-
-FarmTab:Toggle({
-    Title = "Auto Grab Gun",
-    Desc = "Instantly teleport and pick up dropped sheriff gun.",
-    Default = false,
-    Callback = function(Value) AutoGrabGun_Enabled = Value end
-})
-
-local TeleportTab = Window:Tab({
-    Title = "Teleport",
-    Icon = "map-pin",
-})
-
-TeleportTab:Section({ Title = "MM2 Custom Teleports" })
-
-TeleportTab:Button({
-    Title = "Teleport to Lobby",
-    Desc = "Teleport back to the lobby.",
-    Callback = function()
-        local p = Players.LocalPlayer
-        if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-            p.Character.HumanoidRootPart.CFrame = CFrame.new(5.51, 506.82, -16.91)
-        end
-    end
-})
-
-TeleportTab:Button({
-    Title = "TP to map (Sheriff)",
-    Desc = "Teleport straight to the sheriff holding the gun.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        local foundSheriff = false
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp and p.Character then
-                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-                if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
-                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 4, 0)
-                    foundSheriff = true
-                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Sheriff!", Duration = 2 })
-                    break
+    _st9352=453
+  end
+  if _st9352==453 then
+                for obj, trans in pairs(_III1lll1II123) do
+    _st9352=454
+  end
+  if _st9352==454 then
+                    if obj and obj.Parent then
+    _st9352=455
+  end
+  if _st9352==455 then
+                        obj.Transparency = trans
+    _st9352=456
+  end
+  if _st9352==456 then
+                    end
+    _st9352=457
+  end
+  if _st9352==457 then
                 end
+    _st9352=458
+  end
+  if _st9352==458 then
+                table.clear(_III1lll1II123)
+    _st9352=459
+  end
+  if _st9352==459 then
             end
+    _st9352=460
+  end
+  if _st9352==460 then
         end
-        if not foundSheriff then
-            WindUI:Notify({ Title = "Teleport", Content = "Sheriff not found or gun not taken yet.", Duration = 2 })
-        end
+    _st9352=461
+  end
+  if _st9352==461 then
+    })
+    _st9352=462
+  end
+  if _st9352==462 then
+    local function _IIIl1lI1lI54(_Il1IIlII78)
+    _st9352=463
+  end
+  if _st9352==463 then
+        if not _IlI1l1llIl17 then return Color3.fromRGB((272-17), (0+255), (127+128)) end
+    _st9352=464
+  end
+  if _st9352==464 then
+        if _Il1IIlII78:FindFirstChild(_dec6734({(0+20),(96-7),(0+81),(0+88),(33+34),(43+43),(0+53),(96-13)})) and _Il1IIlII78.Backpack:FindFirstChild(_dec6734({(43-14),(99-13),(0+91),(0+85),(0+86)})) or _Il1IIlII78.Character and _Il1IIlII78.Character:FindFirstChild(_dec6734({(0+29),(125-39),(125-34),(0+85),(43+43)})) then return Color3.fromRGB((127+128), (0+0), (36-36)) end
+    _st9352=465
+  end
+  if _st9352==465 then
+        if _Il1IIlII78:FindFirstChild(_dec6734({(10+10),(0+89),(0+81),(44+44),(0+67),(113-27),(72-19),(0+83)})) and _Il1IIlII78.Backpack:FindFirstChild(_dec6734({(8+9),(96-19),(0+92)})) or _Il1IIlII78.Character and _Il1IIlII78.Character:FindFirstChild(_dec6734({(41-24),(105-28),(46+46)})) then return Color3.fromRGB((0+0), (52-52), (268-13)) end
+    _st9352=466
+  end
+  if _st9352==466 then
+        return Color3.fromRGB((45-45), (127+128), (0+0))
+    _st9352=467
+  end
+  if _st9352==467 then
     end
-})
-
-TeleportTab:Button({
-    Title = "Teleport to Sheriff (Gun Holder)",
-    Desc = "Teleport right above the player holding the gun.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp and p.Character then
-                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-                if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
-                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 4, 0)
-                    break
+    _st9352=468
+  end
+  if _st9352==468 then
+    local function _I1llI1Il1lll55(_Il1IIlII78, _Il1l1lll34)
+    _st9352=469
+  end
+  if _st9352==469 then
+        if _IIllIl1110[_Il1IIlII78.Name] then return end
+    _st9352=470
+  end
+  if _st9352==470 then
+        local _IIIlIll56 = Instance.new(_dec6734({(68-52),(43+44),(47+47),(0+87),(0+86),(117-48)}), workspace)
+    _st9352=471
+  end
+  if _st9352==471 then
+        _IIIlIll56.Name = _Il1IIlII78.Name .. _dec6734({(4+5),(61+62),(0+90),(0+82),(47+47),(34+34),(57-41),(43+44),(0+94),(0+87),(0+86),(99-30)})
+    _st9352=472
+  end
+  if _st9352==472 then
+        _IIllIl1110[_Il1IIlII78.Name] = _IIIlIll56
+    _st9352=473
+  end
+  if _st9352==473 then
+        for _, part in pairs(_Il1l1lll34:GetChildren()) do
+    _st9352=474
+  end
+  if _st9352==474 then
+            if part:IsA(_dec6734({(38-18),(111-22),(32+33),(43+43),(0+99),(0+86),(18+18),(87-11)})) and part.Name ~= _dec6734({(0+30),(38+39),(47+48),(0+82),(102-9),(103-15),(0+63),(46+46),(48+48),(123-31),(0+92),(82-15),(51-45),(0+89),(32+32),(35+36)}) then
+    _st9352=475
+  end
+  if _st9352==475 then
+                local _III1ll57 = Instance.new(_dec6734({(10+10),(0+87),(37+37),(141-18),(41+41),(140-51),(77-27),(104-20),(0+87),(0+114),(43+44),(44+44),(85-49),(0+86),(106-11),(0+86),(0+93),(0+67)}), _IIIlIll56)
+    _st9352=476
+  end
+  if _st9352==476 then
+                _III1ll57.Size = part.Size + Vector3.new((0+0).05, (0+0).05, (16-16).05)
+    _st9352=477
+  end
+  if _st9352==477 then
+                _III1ll57.AlwaysOnTop, _III1ll57.ZIndex, _III1ll57.Adornee, _III1ll57.Transparency = true, (0+5), part, (0+0).5
+    _st9352=478
+  end
+  if _st9352==478 then
+            end
+    _st9352=479
+  end
+  if _st9352==479 then
+        end
+    _st9352=480
+  end
+  if _st9352==480 then
+    end
+    _st9352=481
+  end
+  if _st9352==481 then
+    local function _IIlllll158(_IIlllllIll179)
+    _st9352=482
+  end
+  if _st9352==482 then
+        local _Il1ll1lIIIll159, _IIl1l160 = nil, math.huge
+    _st9352=483
+  end
+  if _st9352==483 then
+        for _, obj in pairs(workspace:GetDescendants()) do
+    _st9352=484
+  end
+  if _st9352==484 then
+            pcall(function()
+    _st9352=485
+  end
+  if _st9352==485 then
+                if obj:IsA(_dec6734({(42-22),(117-28),(101-36),(43+43),(49+50),(43+43),(0+36),(93-17)})) and (obj.Name == _dec6734({(13+14),(44+45),(45+46),(46+47),(141-29),(107-19),(105-42),(0+86)}) or obj.Name:lower():find(_dec6734({(26+27),(135-48),(128-37),(99-6)}))) then
+    _st9352=486
+  end
+  if _st9352==486 then
+                    if not (math.abs(obj.Position.Y - (253+253).82) < (5+5) and math.abs(obj.Position.X - (2+3).51) < (0+100)) then
+    _st9352=487
+  end
+  if _st9352==487 then
+                        local _IIl1llI61 = (_IIlllllIll179.Position - obj.Position).Magnitude
+    _st9352=488
+  end
+  if _st9352==488 then
+                        if _IIl1llI61 < _IIl1l160 then _IIl1l160, _Il1ll1lIIIll159 = _IIl1llI61, obj end
+    _st9352=489
+  end
+  if _st9352==489 then
+                    end
+    _st9352=490
+  end
+  if _st9352==490 then
                 end
+    _st9352=491
+  end
+  if _st9352==491 then
+            end)
+    _st9352=492
+  end
+  if _st9352==492 then
+        end
+    _st9352=493
+  end
+  if _st9352==493 then
+        return _Il1ll1lIIIll159
+    _st9352=494
+  end
+  if _st9352==494 then
+    end
+    _st9352=495
+  end
+  if _st9352==495 then
+    task.spawn(function()
+    _st9352=496
+  end
+  if _st9352==496 then
+        while true do
+    _st9352=497
+  end
+  if _st9352==497 then
+            task.wait((52-52).01)
+    _st9352=498
+  end
+  if _st9352==498 then
+            if _II1llIIl17 and not _I11lIIII13 and not _IIlIl1l1lI19 then
+    _st9352=499
+  end
+  if _st9352==499 then
+                local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=500
+  end
+  if _st9352==500 then
+                local _I1IIlllll135 = _IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(0+30),(0+77),(0+95),(41+41),(46+47),(104-16),(0+63),(127-35),(0+96),(46+46),(0+92),(0+67),(0+6),(0+89),(112-48),(0+71)}))
+    _st9352=501
+  end
+  if _st9352==501 then
+                local _Il1lII36 = _IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(57-27),(38+39),(0+95),(0+82),(103-10),(0+88),(110-47),(0+92)}))
+    _st9352=502
+  end
+  if _st9352==502 then
+                if _I1IIlllll135 and _Il1lII36 and _Il1lII36.Health > (0+0) then
+    _st9352=503
+  end
+  if _st9352==503 then
+                    local _Il1II11Il62 = _IIlllll158(_I1IIlllll135)
+    _st9352=504
+  end
+  if _st9352==504 then
+                    if _Il1II11Il62 and _Il1II11Il62.Parent then
+    _st9352=505
+  end
+  if _st9352==505 then
+                        localPlayer_Noclip_Active = true
+    _st9352=506
+  end
+  if _st9352==506 then
+                        local _Illl1lllll1II63 = _IlIIlllI1:Create(_I1IIlllll135, TweenInfo.new((_I1IIlllll135.Position - _Il1II11Il62.Position).Magnitude / _IlIl1Il1l1l18, Enum.EasingStyle.Linear), {CFrame = CFrame.new(_Il1II11Il62.Position + Vector3.new((0+0), (34-34).2, (10-10)))})
+    _st9352=507
+  end
+  if _st9352==507 then
+                        _Illl1lllll1II63:Play()
+    _st9352=508
+  end
+  if _st9352==508 then
+                        while _Illl1lllll1II63.PlaybackState == Enum.PlaybackState.Playing and _II1llIIl17 and not _I11lIIII13 and not _IIlIl1l1lI19 and _Il1II11Il62.Parent and _Il1lII36.Health > (0+0) do task.wait() end
+    _st9352=509
+  end
+  if _st9352==509 then
+                        _Illl1lllll1II63:Cancel()
+    _st9352=510
+  end
+  if _st9352==510 then
+                        localPlayer_Noclip_Active = false
+    _st9352=511
+  end
+  if _st9352==511 then
+                    end
+    _st9352=512
+  end
+  if _st9352==512 then
+                end
+    _st9352=513
+  end
+  if _st9352==513 then
             end
+    _st9352=514
+  end
+  if _st9352==514 then
         end
-    end
-})
-
-TeleportTab:Button({
-    Title = "Teleport to Dropped Gun",
-    Desc = "Instantly teleport to the dropped gun.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("BasePart") and v.Name == "GunDrop" then
-                lp.Character.HumanoidRootPart.CFrame = v.CFrame * CFrame.new(0, 1, 0)
-                break
-            end
-        end
-    end
-})
-
-local ESPTab = Window:Tab({
-    Title = "Visuals / ESP",
-    Icon = "eye",
-})
-
-ESPTab:Section({ Title = "ESP Settings" })
-
-ESPTab:Toggle({
-    Title = "Enable Player ESP (Chams)",
-    Desc = "Toggle wallhack highlights on players.",
-    Default = false,
-    Callback = function(Value)
-        ESP_Enabled = Value
-        if not Value then
-            for _, folder in pairs(ChamsContainer) do if folder then pcall(function() folder:Destroy() end) end end
-            table.clear(ChamsContainer)
-            ClearAllNameTags()
-        end
-    end
-})
-
-ESPTab:Toggle({
-    Title = "Show Roles (MM2)",
-    Desc = "Color-code roles (Red=Murder, Blue=Sheriff, Green=Innocent).",
-    Default = false,
-    Callback = function(Value) ESP_ShowRoles = Value end
-})
-
-ESPTab:Toggle({
-    Title = "Show Player Names",
-    Desc = "Display name tags above players.",
-    Default = false,
-    Callback = function(Value)
-        ESP_ShowNames = Value
-        if not Value then ClearAllNameTags() end
-    end
-})
-
-ESPTab:Toggle({
-    Title = "Show Dropped Gun ESP",
-    Desc = "Highlight the dropped sheriff gun on the floor.",
-    Default = false,
-    Callback = function(Value)
-        ESP_ShowGun = Value
-        if not Value then ClearGunESP() end
-    end
-})
-
-ESPTab:Section({ Title = "World Visuals" })
-
-ESPTab:Toggle({
-    Title = "X-Ray (Map Transparency)",
-    Desc = "Makes the entire map semi-transparent excluding players.",
-    Default = false,
-    Callback = function(Value)
-        XRay_Enabled = Value
-        if Value then
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj:IsA("BasePart") then
-                    local isCharacterPart = false
-                    for _, p in pairs(Players:GetPlayers()) do
-                        if p.Character and obj:IsDescendantOf(p.Character) then
-                            isCharacterPart = true
-                            break
+    _st9352=515
+  end
+  if _st9352==515 then
+    end)
+    _st9352=516
+  end
+  if _st9352==516 then
+    task.spawn(function()
+    _st9352=517
+  end
+  if _st9352==517 then
+        while true do
+    _st9352=518
+  end
+  if _st9352==518 then
+            task.wait((0+0).2)
+    _st9352=519
+  end
+  if _st9352==519 then
+            if _Il11II20 then
+    _st9352=520
+  end
+  if _st9352==520 then
+                local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=521
+  end
+  if _st9352==521 then
+                local _Il1l1lll34 = _IIIlIl133.Character
+    _st9352=522
+  end
+  if _st9352==522 then
+                local _I1IIlllll135 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(41-11),(38+39),(0+95),(115-33),(133-40),(44+44),(31+32),(0+92),(0+96),(0+92),(0+92),(104-37),(0+6),(124-35),(32+32),(35+36)}))
+    _st9352=523
+  end
+  if _st9352==523 then
+                local _Il1lII36 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(15+15),(38+39),(0+95),(41+41),(0+93),(44+44),(74-11),(123-31)}))
+    _st9352=524
+  end
+  if _st9352==524 then
+                if _I1IIlllll135 and _Il1lII36 and _Il1lII36.Health > (0+0) then
+    _st9352=525
+  end
+  if _st9352==525 then
+                    local _I1l1l1llIIlII43 = _IIIlIl133:FindFirstChild(_dec6734({(10+10),(103-14),(0+81),(134-46),(33+34),(43+43),(65-12),(100-17)})) and _IIIlIl133.Backpack:FindFirstChild(_dec6734({(68-51),(92-15),(46+46)})) or _Il1l1lll34:FindFirstChild(_dec6734({(8+9),(38+39),(0+92)}))
+    _st9352=526
+  end
+  if _st9352==526 then
+                    if not _I1l1l1llIIlII43 then
+    _st9352=527
+  end
+  if _st9352==527 then
+                        for _, v in pairs(workspace:GetDescendants()) do
+    _st9352=528
+  end
+  if _st9352==528 then
+                            if v:IsA(_dec6734({(10+10),(121-32),(111-46),(92-6),(49+50),(43+43),(67-31),(0+76)})) and v.Name == _dec6734({(0+17),(0+77),(46+46),(0+119),(32+33),(44+44),(0+38)}) then
+    _st9352=529
+  end
+  if _st9352==529 then
+                                _I1IIlllll135.CFrame = v.CFrame * CFrame.new((0+0), (0+1), (51-51))
+    _st9352=530
+  end
+  if _st9352==530 then
+                                _IIIlIl10:Notify({ Title = _dec6734({(63-40),(0+77),(78-8),(0+92),(9+10),(56+56),(18+18),(0+89),(115-35),(9+10),(0+116),(71-5),(0+56)}), Content = _dec6734({(2+3),(121-44),(0+81),(0+80),(43+43),(0+68),(65-28),(47+47),(0+71),(47+48),(109-14),(39+39),(156-38),(0+95),(85-21),(0+82),(99-18),(0+85),(25+26),(46+46),(0+18),(127-40),(32+33),(118-30),(19+19),(36+36),(0+87),(43+44),(9+10),(0+104),(81-50),(56+57),(0+94),(0+2),(47+48),(0+91),(15+16),(0+11),(2+3),(0+18)}), Duration = (0+2) })
+    _st9352=531
+  end
+  if _st9352==531 then
+                                task.wait((0+1))
+    _st9352=532
+  end
+  if _st9352==532 then
+                                break
+    _st9352=533
+  end
+  if _st9352==533 then
+                            end
+    _st9352=534
+  end
+  if _st9352==534 then
                         end
+    _st9352=535
+  end
+  if _st9352==535 then
                     end
-                    if not isCharacterPart then
-                        OriginalTransparency[obj] = obj.Transparency
-                        obj.Transparency = 0.6
-                    end
+    _st9352=536
+  end
+  if _st9352==536 then
                 end
+    _st9352=537
+  end
+  if _st9352==537 then
             end
-        else
-            for obj, trans in pairs(OriginalTransparency) do
-                if obj and obj.Parent then
-                    obj.Transparency = trans
-                end
-            end
-            table.clear(OriginalTransparency)
+    _st9352=538
+  end
+  if _st9352==538 then
         end
-    end
-})
-
-local function GetPlayerRoleColor(player)
-    if not ESP_ShowRoles then return Color3.fromRGB(255, 255, 255) end
-    if player:FindFirstChild("Backpack") and player.Backpack:FindFirstChild("Knife") or player.Character and player.Character:FindFirstChild("Knife") then return Color3.fromRGB(255, 0, 0) end
-    if player:FindFirstChild("Backpack") and player.Backpack:FindFirstChild("Gun") or player.Character and player.Character:FindFirstChild("Gun") then return Color3.fromRGB(0, 0, 255) end
-    return Color3.fromRGB(0, 255, 0)
-end
-
-local function ApplyChams(player, char)
-    if ChamsContainer[player.Name] then return end
-    local folder = Instance.new("Folder", workspace)
-    folder.Name = player.Name .. "_ChamsFolder"
-    ChamsContainer[player.Name] = folder
-    for _, part in pairs(char:GetChildren()) do
-        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-            local box = Instance.new("BoxHandleAdornment", folder)
-            box.Size = part.Size + Vector3.new(0.05, 0.05, 0.05)
-            box.AlwaysOnTop, box.ZIndex, box.Adornee, box.Transparency = true, 5, part, 0.5
-        end
-    end
-end
-
-local function FindNearestCoin(playerRoot)
-    local closest, shortest = nil, math.huge
-    for _, obj in pairs(workspace:GetDescendants()) do
-        pcall(function()
-            if obj:IsA("BasePart") and (obj.Name == "MainCoin" or obj.Name:lower():find("coin")) then
-                if not (math.abs(obj.Position.Y - 506.82) < 10 and math.abs(obj.Position.X - 5.51) < 100) then
-                    local dist = (playerRoot.Position - obj.Position).Magnitude
-                    if dist < shortest then shortest, closest = dist, obj end
-                end
-            end
-        end)
-    end
-    return closest
-end
-
-task.spawn(function()
-    while true do
-        task.wait(0.01)
-        if AutoFarm_Enabled and not Fly_Enabled and not KillAll_Enabled then
-            local lp = Players.LocalPlayer
-            local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-            local hum = lp.Character and lp.Character:FindFirstChild("Humanoid")
-            if root and hum and hum.Health > 0 then
-                local targetCoin = FindNearestCoin(root)
-                if targetCoin and targetCoin.Parent then
-                    localPlayer_Noclip_Active = true
-                    local tween = TweenService:Create(root, TweenInfo.new((root.Position - targetCoin.Position).Magnitude / FarmSpeed, Enum.EasingStyle.Linear), {CFrame = CFrame.new(targetCoin.Position + Vector3.new(0, 0.2, 0))})
-                    tween:Play()
-                    while tween.PlaybackState == Enum.PlaybackState.Playing and AutoFarm_Enabled and not Fly_Enabled and not KillAll_Enabled and targetCoin.Parent and hum.Health > 0 do task.wait() end
-                    tween:Cancel()
-                    localPlayer_Noclip_Active = false
-                end
-            end
-        end
-    end
-end)
-
-task.spawn(function()
-    while true do
-        task.wait(0.2)
-        if AutoGrabGun_Enabled then
-            local lp = Players.LocalPlayer
-            local char = lp.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            local hum = char and char:FindFirstChild("Humanoid")
-            
-            if root and hum and hum.Health > 0 then
-                local hasGun = lp:FindFirstChild("Backpack") and lp.Backpack:FindFirstChild("Gun") or char:FindFirstChild("Gun")
-                if not hasGun then
-                    for _, v in pairs(workspace:GetDescendants()) do
-                        if v:IsA("BasePart") and v.Name == "GunDrop" then
-                            root.CFrame = v.CFrame * CFrame.new(0, 1, 0)
-                            WindUI:Notify({ Title = "Auto Grab Gun", Content = "Successfully grabbed dropped gun!", Duration = 2 })
-                            task.wait(1)
-                            break
-                        end
-                    end
-                end
-            end
-        end
-    end
-end)
-
-task.spawn(function()
-    local killedTargets = {}
-    
-    while true do
-        task.wait(0.1)
-        
-        if not KillAll_Enabled then
-            table.clear(killedTargets)
-        else
-            local lp = Players.LocalPlayer
-            local char = lp.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            local hum = char and char:FindFirstChild("Humanoid")
-            
-            if root and hum and hum.Health > 0 then
-                local knife = lp:FindFirstChild("Backpack") and lp.Backpack:FindFirstChild("Knife") or char:FindFirstChild("Knife")
-                if knife then
-                    local allCleared = true
-                    
-                    for _, enemy in pairs(Players:GetPlayers()) do
-                        if not KillAll_Enabled then break end
-                        
-                        if enemy ~= lp and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") and enemy.Character:FindFirstChild("Humanoid") then
-                            local enemyHum = enemy.Character.Humanoid
-                            
-                            if enemyHum.Health > 0 and not killedTargets[enemy.Name] then
-                                allCleared = false
-                                local enemyRoot = enemy.Character.HumanoidRootPart
-                                
-                                localPlayer_Noclip_Active = true
-                                root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
-                                task.wait(0.1)
-                                
-                                if knife.Parent == lp.Backpack then
-                                    hum:EquipTool(knife)
-                                end
-                                
-                                local startTime = tick()
-                                while KillAll_Enabled and enemy.Parent and enemyHum.Health > 0 and (tick() - startTime < 3) do
-                                    VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                                    task.wait(0.05)
-                                    VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                                    task.wait(0.15)
-                                    
-                                    if enemyRoot and root then
-                                        root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
+    _st9352=539
+  end
+  if _st9352==539 then
+    end)
+    _st9352=540
+  end
+  if _st9352==540 then
+    task.spawn(function()
+    _st9352=541
+  end
+  if _st9352==541 then
+        local _IIll1l64 = {}
+    _st9352=542
+  end
+  if _st9352==542 then
+        while true do
+    _st9352=543
+  end
+  if _st9352==543 then
+            task.wait((49-49).1)
+    _st9352=544
+  end
+  if _st9352==544 then
+            if not _IIlIl1l1lI19 then
+    _st9352=545
+  end
+  if _st9352==545 then
+                table.clear(_IIll1l64)
+    _st9352=546
+  end
+  if _st9352==546 then
+            else
+    _st9352=547
+  end
+  if _st9352==547 then
+                local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=548
+  end
+  if _st9352==548 then
+                local _Il1l1lll34 = _IIIlIl133.Character
+    _st9352=549
+  end
+  if _st9352==549 then
+                local _I1IIlllll135 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(0+30),(92-15),(47+48),(102-20),(0+93),(123-35),(31+32),(0+92),(0+96),(119-27),(0+92),(0+67),(58-52),(0+89),(0+64),(35+36)}))
+    _st9352=550
+  end
+  if _st9352==550 then
+                local _Il1lII36 = _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(0+30),(38+39),(47+48),(124-42),(0+93),(115-27),(31+32),(46+46)}))
+    _st9352=551
+  end
+  if _st9352==551 then
+                if _I1IIlllll135 and _Il1lII36 and _Il1lII36.Health > (0+0) then
+    _st9352=552
+  end
+  if _st9352==552 then
+                    local _IllIl1l65 = _IIIlIl133:FindFirstChild(_dec6734({(10+10),(44+45),(0+81),(44+44),(85-18),(43+43),(0+53),(88-5)})) and _IIIlIl133.Backpack:FindFirstChild(_dec6734({(48-19),(0+86),(45+46),(42+43),(98-12)})) or _Il1l1lll34:FindFirstChild(_dec6734({(0+29),(0+86),(111-20),(102-17),(43+43)}))
+    _st9352=553
+  end
+  if _st9352==553 then
+                    if _IllIl1l65 then
+    _st9352=554
+  end
+  if _st9352==554 then
+                        local _I1l1lIIlll66 = true
+    _st9352=555
+  end
+  if _st9352==555 then
+                        for _, enemy in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=556
+  end
+  if _st9352==556 then
+                            if not _IIlIl1l1lI19 then break end
+    _st9352=557
+  end
+  if _st9352==557 then
+                            if enemy ~= _IIIlIl133 and enemy.Character and enemy.Character:FindFirstChild(_dec6734({(0+30),(0+77),(132-37),(41+41),(0+93),(110-22),(31+32),(139-47),(0+96),(98-6),(117-25),(72-5),(53-47),(0+89),(94-30),(0+71)})) and enemy.Character:FindFirstChild(_dec6734({(81-51),(0+77),(47+48),(41+41),(0+93),(122-34),(31+32),(0+92)})) then
+    _st9352=558
+  end
+  if _st9352==558 then
+                                local _IlIlll1IIl167 = enemy.Character.Humanoid
+    _st9352=559
+  end
+  if _st9352==559 then
+                                if _IlIlll1IIl167.Health > (0+0) and not _IIll1l64[enemy.Name] then
+    _st9352=560
+  end
+  if _st9352==560 then
+                                    _I1l1lIIlll66 = false
+    _st9352=561
+  end
+  if _st9352==561 then
+                                    local _I1IlI40 = enemy.Character.HumanoidRootPart
+    _st9352=562
+  end
+  if _st9352==562 then
+                                    localPlayer_Noclip_Active = true
+    _st9352=563
+  end
+  if _st9352==563 then
+                                    _I1IIlllll135.CFrame = _I1IlI40.CFrame * CFrame.new((0+0), (50-50), (0+2))
+    _st9352=564
+  end
+  if _st9352==564 then
+                                    task.wait((0+0).1)
+    _st9352=565
+  end
+  if _st9352==565 then
+                                    if _IllIl1l65.Parent == _IIIlIl133.Backpack then
+    _st9352=566
+  end
+  if _st9352==566 then
+                                        _Il1lII36:EquipTool(_IllIl1l65)
+    _st9352=567
+  end
+  if _st9352==567 then
                                     end
+    _st9352=568
+  end
+  if _st9352==568 then
+                                    local _IlIl11l1l45 = tick()
+    _st9352=569
+  end
+  if _st9352==569 then
+                                    while _IIlIl1l1lI19 and enemy.Parent and _IlIlll1IIl167.Health > (9-9) and (tick() - _IlIl11l1l45 < (14-11)) do
+    _st9352=570
+  end
+  if _st9352==570 then
+                                        _I1llIl1I1lIl3:Button1Down(Vector2.new((0+0), (0+0)), workspace.CurrentCamera.CFrame)
+    _st9352=571
+  end
+  if _st9352==571 then
+                                        task.wait((52-52).05)
+    _st9352=572
+  end
+  if _st9352==572 then
+                                        _I1llIl1I1lIl3:Button1Up(Vector2.new((0+0), (18-18)), workspace.CurrentCamera.CFrame)
+    _st9352=573
+  end
+  if _st9352==573 then
+                                        task.wait((0+0).15)
+    _st9352=574
+  end
+  if _st9352==574 then
+                                        if _I1IlI40 and _I1IIlllll135 then
+    _st9352=575
+  end
+  if _st9352==575 then
+                                            _I1IIlllll135.CFrame = _I1IlI40.CFrame * CFrame.new((0+0), (23-23), (1+1))
+    _st9352=576
+  end
+  if _st9352==576 then
+                                        end
+    _st9352=577
+  end
+  if _st9352==577 then
+                                    end
+    _st9352=578
+  end
+  if _st9352==578 then
+                                    if _IlIlll1IIl167.Health <= (49-49) then
+    _st9352=579
+  end
+  if _st9352==579 then
+                                        _IIll1l64[enemy.Name] = true
+    _st9352=580
+  end
+  if _st9352==580 then
+                                    end
+    _st9352=581
+  end
+  if _st9352==581 then
+                                    localPlayer_Noclip_Active = false
+    _st9352=582
+  end
+  if _st9352==582 then
+                                    task.wait((47-47).2)
+    _st9352=583
+  end
+  if _st9352==583 then
                                 end
-                                
-                                if enemyHum.Health <= 0 then
-                                    killedTargets[enemy.Name] = true
-                                end
-                                
-                                localPlayer_Noclip_Active = false
-                                task.wait(0.2)
+    _st9352=584
+  end
+  if _st9352==584 then
                             end
+    _st9352=585
+  end
+  if _st9352==585 then
                         end
+    _st9352=586
+  end
+  if _st9352==586 then
+                        if _I1l1lIIlll66 then
+    _st9352=587
+  end
+  if _st9352==587 then
+                            table.clear(_IIll1l64)
+    _st9352=588
+  end
+  if _st9352==588 then
+                            task.wait((0+1))
+    _st9352=589
+  end
+  if _st9352==589 then
+                        end
+    _st9352=590
+  end
+  if _st9352==590 then
                     end
-                    
-                    if allCleared then
-                        table.clear(killedTargets)
-                        task.wait(1)
-                    end
+    _st9352=591
+  end
+  if _st9352==591 then
                 end
+    _st9352=592
+  end
+  if _st9352==592 then
             end
+    _st9352=593
+  end
+  if _st9352==593 then
         end
-    end
-end)
-
-local lastDodgeTick = 0
-
-RunService.Heartbeat:Connect(function()
-    local lp = Players.LocalPlayer
-    local camera = workspace.CurrentCamera
-    
-    if (Noclip_Enabled or localPlayer_Noclip_Active) and lp.Character then
-        for _, p in pairs(lp.Character:GetChildren()) do if p:IsA("BasePart") then p.CanCollide = false end end
-    end
-
-    if Fly_Enabled and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and Fly_BodyVelocity and Fly_BodyGyro then
-        local root = lp.Character.HumanoidRootPart
-        Fly_BodyGyro.cframe = camera.CFrame
-        local dir = Vector3.new(0,0,0)
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + camera.CFrame.LookVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - camera.CFrame.LookVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - camera.CFrame.RightVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + camera.CFrame.RightVector end
-        Fly_BodyVelocity.velocity = dir.Magnitude > 0 and dir.Unit * FlySpeed or Vector3.new(0,0,0)
-    end
-
-    if AutoDodgeKnife_Enabled and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
-        local root = lp.Character.HumanoidRootPart
-        if tick() - lastDodgeTick > 0.4 then
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj:IsA("BasePart") and obj.Name == "KnifeProjectile" then
-                    local isOwnedByPlayer = false
-                    for _, p in pairs(Players:GetPlayers()) do
-                        if p.Character and obj:IsDescendantOf(p.Character) then
-                            isOwnedByPlayer = true
-                            break
+    _st9352=594
+  end
+  if _st9352==594 then
+    end)
+    _st9352=595
+  end
+  if _st9352==595 then
+    local _IIlIIl68 = (0+0)
+    _st9352=596
+  end
+  if _st9352==596 then
+    _Il1lIIl4.Heartbeat:Connect(function()
+    _st9352=597
+  end
+  if _st9352==597 then
+        local _IIIlIl133 = _IlIIII15.LocalPlayer
+    _st9352=598
+  end
+  if _st9352==598 then
+        local _I1ll11169 = workspace.CurrentCamera
+    _st9352=599
+  end
+  if _st9352==599 then
+        if (_Il1II12 or localPlayer_Noclip_Active) and _IIIlIl133.Character then
+    _st9352=600
+  end
+  if _st9352==600 then
+            for _, _I111l48 in pairs(_IIIlIl133.Character:GetChildren()) do if _I111l48:IsA(_dec6734({(10+10),(94-5),(0+65),(0+86),(49+50),(0+86),(18+18),(38+38)})) then _I111l48.CanCollide = false end end
+    _st9352=601
+  end
+  if _st9352==601 then
+        end
+    _st9352=602
+  end
+  if _st9352==602 then
+        if _I11lIIII13 and _IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(42-12),(0+77),(0+95),(0+82),(0+93),(44+44),(0+63),(0+92),(0+96),(46+46),(46+46),(100-33),(11-5),(105-16),(0+64),(123-52)})) and _IIIIIll1IIII15 and _I1l1l116 then
+    _st9352=603
+  end
+  if _st9352==603 then
+            local _I1IIlllll135 = _IIIlIl133.Character.HumanoidRootPart
+    _st9352=604
+  end
+  if _st9352==604 then
+            _I1l1l116.cframe = _I1ll11169.CFrame
+    _st9352=605
+  end
+  if _st9352==605 then
+            local _IIIIllIl1ll70 = Vector3.new((0+0),(0+0),(0+0))
+    _st9352=606
+  end
+  if _st9352==606 then
+            if _IIIlI1ll2:IsKeyDown(Enum.KeyCode.W) then _IIIIllIl1ll70 = _IIIIllIl1ll70 + _I1ll11169.CFrame.LookVector end
+    _st9352=607
+  end
+  if _st9352==607 then
+            if _IIIlI1ll2:IsKeyDown(Enum.KeyCode.S) then _IIIIllIl1ll70 = _IIIIllIl1ll70 - _I1ll11169.CFrame.LookVector end
+    _st9352=608
+  end
+  if _st9352==608 then
+            if _IIIlI1ll2:IsKeyDown(Enum.KeyCode.A) then _IIIIllIl1ll70 = _IIIIllIl1ll70 - _I1ll11169.CFrame.RightVector end
+    _st9352=609
+  end
+  if _st9352==609 then
+            if _IIIlI1ll2:IsKeyDown(Enum.KeyCode.D) then _IIIIllIl1ll70 = _IIIIllIl1ll70 + _I1ll11169.CFrame.RightVector end
+    _st9352=610
+  end
+  if _st9352==610 then
+            _IIIIIll1IIII15.velocity = _IIIIllIl1ll70.Magnitude > (39-39) and _IIIIllIl1ll70.Unit * _IllIIlIl14 or Vector3.new((0+0),(0+0),(50-50))
+    _st9352=611
+  end
+  if _st9352==611 then
+        end
+    _st9352=612
+  end
+  if _st9352==612 then
+        if _IlIlIl1l21 and _IIIlIl133.Character and _IIIlIl133.Character:FindFirstChild(_dec6734({(69-39),(129-52),(47+48),(0+82),(0+93),(93-5),(111-48),(46+46),(126-30),(0+92),(0+92),(116-49),(20-14),(44+45),(79-15),(35+36)})) then
+    _st9352=613
+  end
+  if _st9352==613 then
+            local _I1IIlllll135 = _IIIlIl133.Character.HumanoidRootPart
+    _st9352=614
+  end
+  if _st9352==614 then
+            if tick() - _IIlIIl68 > (0+0).4 then
+    _st9352=615
+  end
+  if _st9352==615 then
+                for _, obj in pairs(workspace:GetDescendants()) do
+    _st9352=616
+  end
+  if _st9352==616 then
+                    if obj:IsA(_dec6734({(0+20),(0+89),(119-54),(43+43),(49+50),(0+86),(0+36),(113-37)})) and obj.Name == _dec6734({(14+15),(124-38),(125-34),(42+43),(101-15),(150-47),(81-45),(43+44),(120-32),(43+43),(40+40),(77-10),(0+63),(134-50),(43+44)}) then
+    _st9352=617
+  end
+  if _st9352==617 then
+                        local _Il11l1lIlI171 = false
+    _st9352=618
+  end
+  if _st9352==618 then
+                        for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=619
+  end
+  if _st9352==619 then
+                            if _I111l48.Character and obj:IsDescendantOf(_I111l48.Character) then
+    _st9352=620
+  end
+  if _st9352==620 then
+                                _Il11l1lIlI171 = true
+    _st9352=621
+  end
+  if _st9352==621 then
+                                break
+    _st9352=622
+  end
+  if _st9352==622 then
+                            end
+    _st9352=623
+  end
+  if _st9352==623 then
                         end
-                    end
-                    
-                    if not isOwnedByPlayer then
-                        local dist = (root.Position - obj.Position).Magnitude
-                        if dist < 12 then
-                            lastDodgeTick = tick()
-                            root.AssemblyLinearVelocity = root.AssemblyLinearVelocity + Vector3.new(math.random(-12, 12), 12, math.random(12, 20))
-                            break
+    _st9352=624
+  end
+  if _st9352==624 then
+                        if not _Il11l1lIlI171 then
+    _st9352=625
+  end
+  if _st9352==625 then
+                            local _IIl1llI61 = (_I1IIlllll135.Position - obj.Position).Magnitude
+    _st9352=626
+  end
+  if _st9352==626 then
+                            if _IIl1llI61 < (31-19) then
+    _st9352=627
+  end
+  if _st9352==627 then
+                                _IIlIIl68 = tick()
+    _st9352=628
+  end
+  if _st9352==628 then
+                                _I1IIlllll135.AssemblyLinearVelocity = _I1IIlllll135.AssemblyLinearVelocity + Vector3.new(math.random(-(0+12), (57-45)), (60-48), math.random((6+6), (39-19)))
+    _st9352=629
+  end
+  if _st9352==629 then
+                                break
+    _st9352=630
+  end
+  if _st9352==630 then
+                            end
+    _st9352=631
+  end
+  if _st9352==631 then
                         end
+    _st9352=632
+  end
+  if _st9352==632 then
                     end
+    _st9352=633
+  end
+  if _st9352==633 then
                 end
+    _st9352=634
+  end
+  if _st9352==634 then
             end
+    _st9352=635
+  end
+  if _st9352==635 then
         end
-    end
-
-    if ESP_Enabled then
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp then
-                local char = p.Character
-                if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
-                    if not ChamsContainer[p.Name] or not ChamsContainer[p.Name].Parent then ApplyChams(p, char) end
-                    local color = GetPlayerRoleColor(p)
-                    if ChamsContainer[p.Name] then
-                        for _, a in pairs(ChamsContainer[p.Name]:GetChildren()) do if a:IsA("BoxHandleAdornment") then a.Color3 = color end end
-                    end
-                    local head = char:FindFirstChild("Head")
-                    if head then
-                        if ESP_ShowNames then
-                            local tag = head:FindFirstChild("NameESP")
-                            if not tag then
-                                local bb = Instance.new("BillboardGui", head)
-                                bb.Name, bb.Size, bb.AlwaysOnTop, bb.StudsOffset = "NameESP", UDim2.new(0,100,0,30), true, Vector3.new(0,3,0)
-                                local tl = Instance.new("TextLabel", bb)
-                                tl.Size, tl.BackgroundTransparency, tl.Text, tl.TextColor3, tl.Font, tl.TextSize, tl.TextStrokeTransparency = UDim2.new(1,0,1,0), 1, p.DisplayName or p.Name, color, Enum.Font.SourceSansBold, 16, 0.4
+    _st9352=636
+  end
+  if _st9352==636 then
+        if _Il1l11lll6 then
+    _st9352=637
+  end
+  if _st9352==637 then
+            for _, _I111l48 in pairs(_IlIIII15:GetPlayers()) do
+    _st9352=638
+  end
+  if _st9352==638 then
+                if _I111l48 ~= _IIIlIl133 then
+    _st9352=639
+  end
+  if _st9352==639 then
+                    local _Il1l1lll34 = _I111l48.Character
+    _st9352=640
+  end
+  if _st9352==640 then
+                    if _Il1l1lll34 and _Il1l1lll34:FindFirstChild(_dec6734({(0+30),(38+39),(0+95),(102-20),(123-30),(0+88),(31+32),(46+46),(104-8),(0+92),(46+46),(75-8),(0+6),(0+89),(32+32),(0+71)})) and _Il1l1lll34:FindFirstChild(_dec6734({(15+15),(126-49),(108-13),(41+41),(134-41),(0+88),(31+32),(0+92)})) and _Il1l1lll34.Humanoid.Health > (0+0) then
+    _st9352=641
+  end
+  if _st9352==641 then
+                        if not _IIllIl1110[_I111l48.Name] or not _IIllIl1110[_I111l48.Name].Parent then _I1llI1Il1lll55(_I111l48, _Il1l1lll34) end
+    _st9352=642
+  end
+  if _st9352==642 then
+                        local _Il1lII72 = _IIIl1lI1lI54(_I111l48)
+    _st9352=643
+  end
+  if _st9352==643 then
+                        if _IIllIl1110[_I111l48.Name] then
+    _st9352=644
+  end
+  if _st9352==644 then
+                            for _, a in pairs(_IIllIl1110[_I111l48.Name]:GetChildren()) do if a:IsA(_dec6734({(62-42),(0+87),(37+37),(61+62),(0+82),(44+45),(81-31),(0+84),(0+87),(57+57),(43+44),(139-51),(18+18),(43+43),(0+95),(43+43),(0+93),(33+34)})) then a.Color3 = _Il1lII72 end end
+    _st9352=645
+  end
+  if _st9352==645 then
+                        end
+    _st9352=646
+  end
+  if _st9352==646 then
+                        local _IlIIl1lIl29 = _Il1l1lll34:FindFirstChild(_dec6734({(0+30),(0+93),(0+83),(43+44)}))
+    _st9352=647
+  end
+  if _st9352==647 then
+                        if _IlIIl1lIl29 then
+    _st9352=648
+  end
+  if _st9352==648 then
+                            if _I1lI18 then
+    _st9352=649
+  end
+  if _st9352==649 then
+                                local _IllIIll173 = _IlIIl1lIl29:FindFirstChild(_dec6734({(75-51),(44+45),(0+95),(43+43),(0+118),(50+50),(20-14)}))
+    _st9352=650
+  end
+  if _st9352==650 then
+                                if not _IllIIll173 then
+    _st9352=651
+  end
+  if _st9352==651 then
+                                    local _IlI1l1lII174 = Instance.new(_dec6734({(0+20),(0+81),(47+47),(47+48),(0+81),(134-46),(72-17),(0+74),(137-51),(58+58),(0+70),(137-43)}), _IlIIl1lIl29)
+    _st9352=652
+  end
+  if _st9352==652 then
+                                    _IlI1l1lII174.Name, _IlI1l1lII174.Size, _IlI1l1lII174.AlwaysOnTop, _IlI1l1lII174.StudsOffset = _dec6734({(0+24),(0+89),(47+48),(133-47),(153-35),(112-12),(0+6)}), UDim2.new((0+0),(50+50),(0+0),(0+30)), true, Vector3.new((7-7),(28-25),(0+0))
+    _st9352=653
+  end
+  if _st9352==653 then
+                                    local _Il1lIIlIlllIl75 = Instance.new(_dec6734({(1+1),(46+47),(103-29),(0+71),(63+64),(43+43),(26+26),(46+47),(121-27)}), _IlI1l1lII174)
+    _st9352=654
+  end
+  if _st9352==654 then
+                                    _Il1lIIlIlllIl75.Size, _Il1lIIlIlllIl75.BackgroundTransparency, _Il1lIIlIlllIl75.Text, _Il1lIIlIlllIl75.TextColor3, _Il1lIIlIlllIl75.Font, _Il1lIIlIlllIl75.TextSize, _Il1lIIlIlllIl75.TextStrokeTransparency = UDim2.new((0+1),(40-40),(47-46),(0+0)), (23-22), _I111l48.DisplayName or _I111l48.Name, _Il1lII72, Enum.Font.SourceSansBold, (8+8), (0+0).4
+    _st9352=655
+  end
+  if _st9352==655 then
+                                else
+    _st9352=656
+  end
+  if _st9352==656 then
+                                    if _IllIIll173:FindFirstChild(_dec6734({(26-24),(0+93),(37+37),(0+71),(63+64),(103-17),(0+52),(46+47),(47+47)})) then _IllIIll173.TextLabel.TextColor3 = _Il1lII72 end
+    _st9352=657
+  end
+  if _st9352==657 then
+                                end
+    _st9352=658
+  end
+  if _st9352==658 then
                             else
-                                if tag:FindFirstChild("TextLabel") then tag.TextLabel.TextColor3 = color end
+    _st9352=659
+  end
+  if _st9352==659 then
+                                if _IlIIl1lIl29:FindFirstChild(_dec6734({(12+12),(107-18),(47+48),(43+43),(59+59),(112-12),(26-20)})) then _IlIIl1lIl29.NameESP:Destroy() end
+    _st9352=660
+  end
+  if _st9352==660 then
                             end
-                        else
-                            if head:FindFirstChild("NameESP") then head.NameESP:Destroy() end
+    _st9352=661
+  end
+  if _st9352==661 then
                         end
+    _st9352=662
+  end
+  if _st9352==662 then
+                    else
+    _st9352=663
+  end
+  if _st9352==663 then
+                        if _IIllIl1110[_I111l48.Name] then pcall(function() _IIllIl1110[_I111l48.Name]:Destroy() end) _IIllIl1110[_I111l48.Name] = nil end
+    _st9352=664
+  end
+  if _st9352==664 then
                     end
-                else
-                    if ChamsContainer[p.Name] then pcall(function() ChamsContainer[p.Name]:Destroy() end) ChamsContainer[p.Name] = nil end
+    _st9352=665
+  end
+  if _st9352==665 then
                 end
+    _st9352=666
+  end
+  if _st9352==666 then
             end
+    _st9352=667
+  end
+  if _st9352==667 then
         end
-    end
-
-    if ESP_ShowGun then
-        local foundGun = false
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("BasePart") and v.Name == "GunDrop" then
-                foundGun = true
-                if not GunESPContainer["GunDrop"] or not GunESPContainer["GunDrop"].Parent then
-                    local box = Instance.new("BoxHandleAdornment", v)
-                    box.Size = v.Size + Vector3.new(0.1, 0.1, 0.1)
-                    box.AlwaysOnTop = true
-                    box.ZIndex = 6
-                    box.Color3 = Color3.fromRGB(0, 180, 255)
-                    box.Transparency = 0.4
-                    box.Adornee = v
-                    GunESPContainer["GunDrop"] = box
-                    
-                    local bb = Instance.new("BillboardGui", v)
-                    bb.Size = UDim2.new(0, 80, 0, 20)
-                    bb.AlwaysOnTop = true
-                    bb.StudsOffset = Vector3.new(0, 2, 0)
-                    local tl = Instance.new("TextLabel", bb)
-                    tl.Size = UDim2.new(1, 0, 1, 0)
-                    tl.BackgroundTransparency = 1
-                    tl.Text = "★ GUN DROP ★"
-                    tl.TextColor3 = Color3.fromRGB(0, 180, 255)
-                    tl.Font = Enum.Font.SourceSansBold
-                    tl.TextSize = 14
-                    tl.TextStrokeTransparency = 0.2
-                    GunESPContainer["GunDropText"] = bb
+    _st9352=668
+  end
+  if _st9352==668 then
+        if _IIl1l1l19 then
+    _st9352=669
+  end
+  if _st9352==669 then
+            local _III1ll76 = false
+    _st9352=670
+  end
+  if _st9352==670 then
+            for _, v in pairs(workspace:GetDescendants()) do
+    _st9352=671
+  end
+  if _st9352==671 then
+                if v:IsA(_dec6734({(10+10),(44+45),(0+65),(0+86),(49+50),(133-47),(18+18),(0+76)})) and v.Name == _dec6734({(0+17),(0+77),(98-6),(136-17),(0+65),(0+88),(19+19)}) then
+    _st9352=672
+  end
+  if _st9352==672 then
+                    _III1ll76 = true
+    _st9352=673
+  end
+  if _st9352==673 then
+                    if not _I1llIIl11l11[_dec6734({(0+17),(38+39),(46+46),(173-54),(32+33),(0+88),(0+38)})] or not _I1llIIl11l11[_dec6734({(34-17),(38+39),(0+92),(0+119),(98-33),(124-36),(19+19)})].Parent then
+    _st9352=674
+  end
+  if _st9352==674 then
+                        local _III1ll57 = Instance.new(_dec6734({(10+10),(136-49),(94-20),(145-22),(122-40),(44+45),(80-30),(0+84),(128-41),(57+57),(108-21),(117-29),(0+36),(108-22),(47+48),(0+86),(46+47),(0+67)}), v)
+    _st9352=675
+  end
+  if _st9352==675 then
+                        _III1ll57.Size = v.Size + Vector3.new((0+0).1, (13-13).1, (0+0).1)
+    _st9352=676
+  end
+  if _st9352==676 then
+                        _III1ll57.AlwaysOnTop = true
+    _st9352=677
+  end
+  if _st9352==677 then
+                        _III1ll57.ZIndex = (3+3)
+    _st9352=678
+  end
+  if _st9352==678 then
+                        _III1ll57.Color3 = Color3.fromRGB((0+0), (219-39), (0+255))
+    _st9352=679
+  end
+  if _st9352==679 then
+                        _III1ll57.Transparency = (39-39).4
+    _st9352=680
+  end
+  if _st9352==680 then
+                        _III1ll57.Adornee = v
+    _st9352=681
+  end
+  if _st9352==681 then
+                        _I1llIIl11l11[_dec6734({(0+17),(38+39),(0+92),(164-45),(0+65),(44+44),(0+38)})] = _III1ll57
+    _st9352=682
+  end
+  if _st9352==682 then
+                        local _IlI1l1lII174 = Instance.new(_dec6734({(10+10),(0+81),(110-16),(125-30),(40+41),(0+88),(106-51),(120-46),(43+43),(58+58),(0+70),(0+94)}), v)
+    _st9352=683
+  end
+  if _st9352==683 then
+                        _IlI1l1lII174.Size = UDim2.new((0+0), (105-25), (5-5), (0+20))
+    _st9352=684
+  end
+  if _st9352==684 then
+                        _IlI1l1lII174.AlwaysOnTop = true
+    _st9352=685
+  end
+  if _st9352==685 then
+                        _IlI1l1lII174.StudsOffset = Vector3.new((0+0), (1+1), (0+0))
+    _st9352=686
+  end
+  if _st9352==686 then
+                        local _Il1lIIlIlllIl75 = Instance.new(_dec6734({(1+1),(46+47),(37+37),(35+36),(63+64),(0+86),(59-7),(0+93),(47+47)}), _IlI1l1lII174)
+    _st9352=687
+  end
+  if _st9352==687 then
+                        _Il1lIIlIlllIl75.Size = UDim2.new((0+1), (0+0), (0+1), (0+0))
+    _st9352=688
+  end
+  if _st9352==688 then
+                        _Il1lIIlIlllIl75.BackgroundTransparency = (0+1)
+    _st9352=689
+  end
+  if _st9352==689 then
+                        _Il1lIIlIlllIl75.Text = _dec6734({(4905+4906),(67-43),(58+59),(144-42),(62+63),(11+12),(27-9),(111-5),(146-21),(49+50),(9+10),(0+9778)})
+    _st9352=690
+  end
+  if _st9352==690 then
+                        _Il1lIIlIlllIl75.TextColor3 = Color3.fromRGB((18-18), (0+180), (308-53))
+    _st9352=691
+  end
+  if _st9352==691 then
+                        _Il1lIIlIlllIl75.Font = Enum.Font.SourceSansBold
+    _st9352=692
+  end
+  if _st9352==692 then
+                        _Il1lIIlIlllIl75.TextSize = (7+7)
+    _st9352=693
+  end
+  if _st9352==693 then
+                        _Il1lIIlIlllIl75.TextStrokeTransparency = (0+0).2
+    _st9352=694
+  end
+  if _st9352==694 then
+                        _I1llIIl11l11[_dec6734({(70-53),(0+77),(46+46),(59+60),(32+33),(44+44),(19+19),(54+54),(43+44),(127-52),(0+71)})] = _IlI1l1lII174
+    _st9352=695
+  end
+  if _st9352==695 then
+                    end
+    _st9352=696
+  end
+  if _st9352==696 then
                 end
+    _st9352=697
+  end
+  if _st9352==697 then
             end
+    _st9352=698
+  end
+  if _st9352==698 then
+            if not _III1ll76 then _IIl11IlII30() end
+    _st9352=699
+  end
+  if _st9352==699 then
         end
-        if not foundGun then ClearGunESP() end
-    end
-end)
-
-Players.PlayerRemoving:Connect(function(p)
-    if ChamsContainer[p.Name] then pcall(function() ChamsContainer[p.Name]:Destroy() end) ChamsContainer[p.Name] = nil end
-end)
-
-MainTab:Select()
+    _st9352=700
+  end
+  if _st9352==700 then
+    end)
+    _st9352=701
+  end
+  if _st9352==701 then
+    _IlIIII15.PlayerRemoving:Connect(function(_I111l48)
+    _st9352=702
+  end
+  if _st9352==702 then
+        if _IIllIl1110[_I111l48.Name] then pcall(function() _IIllIl1110[_I111l48.Name]:Destroy() end) _IIllIl1110[_I111l48.Name] = nil end
+    _st9352=703
+  end
+  if _st9352==703 then
+    end)
+    _st9352=704
+  end
+  if _st9352==704 then
+    _I1lIIlllIIIIl31:Select()
+    _st9352=705
+  end
+end
