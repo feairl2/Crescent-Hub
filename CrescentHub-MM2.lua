@@ -75,27 +75,25 @@ local function ClearGunESP()
     table.clear(GunESPContainer)
 end
 
-local MainTab = Window:Tab({
-    Title = "Main",
-    Icon = "rbxassetid://4483345998",
+local InformationTab = Window:Tab({
+    Title = "Information",
+    Icon = "info",
 })
 
-MainTab:Section({ Title = "Official Website" })
+InformationTab:Section({ Title = "Community & Links" })
 
-MainTab:Button({
-    Title = "Copy Website URL",
-    Desc = "Copy the official website link.",
+InformationTab:Button({
+    Title = "Website",
+    Desc = "Click to copy the official website link",
     Callback = function()
         if setclipboard then setclipboard("https://crescent-ds7.pages.dev/") end
         WindUI:Notify({ Title = "Crescent Hub", Content = "Website link copied!", Duration = 2 })
     end
 })
 
-MainTab:Section({ Title = "Discord Community" })
-
-MainTab:Button({
-    Title = "Join Our Discord",
-    Desc = "Copy the Discord invite link.",
+InformationTab:Button({
+    Title = "Discord",
+    Desc = "Click to copy the Discord invite link",
     Callback = function()
         if setclipboard then setclipboard("https://discord.gg/sy4R8MbDAQ") end
         WindUI:Notify({ Title = "Crescent Hub", Content = "Discord link copied!", Duration = 2 })
@@ -176,6 +174,203 @@ CombatTab:Toggle({
     Desc = "Uses pathfinding to find a safe node, then teleports to the target.",
     Default = false,
     Callback = function(Value) AutoDodgeMurderer_Enabled = Value end
+})
+
+local FarmTab = Window:Tab({
+    Title = "Auto Farm",
+    Icon = "shopping-cart",
+})
+
+FarmTab:Section({ Title = "Safe Coin Farming" })
+
+FarmTab:Toggle({
+    Title = "Enable Auto Farm Coins",
+    Desc = "Automatically collect coins seamlessly.",
+    Default = false,
+    Callback = function(Value) AutoFarm_Enabled = Value end
+})
+
+FarmTab:Slider({
+    Title = "Farm Tween Speed",
+    Desc = "Recommended: 30. Higher values risk bans.",
+    Value = { Min = 15, Max = 60, Default = 30 },
+    Callback = function(Value) FarmSpeed = Value end
+})
+
+FarmTab:Section({ Title = "Automation" })
+
+FarmTab:Toggle({
+    Title = "Auto Grab Gun",
+    Desc = "Instantly teleport, pick up dropped gun, and return to original position.",
+    Default = false,
+    Callback = function(Value) AutoGrabGun_Enabled = Value end
+})
+
+local VisualTab = Window:Tab({
+    Title = "Visual",
+    Icon = "image",
+})
+
+VisualTab:Section({ Title = "World Visuals" })
+
+VisualTab:Toggle({
+    Title = "X-Ray (Map Transparency)",
+    Desc = "Makes the entire map semi-transparent excluding players.",
+    Default = false,
+    Callback = function(Value)
+        XRay_Enabled = Value
+        if Value then
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("BasePart") then
+                    local isCharacterPart = false
+                    for _, p in pairs(Players:GetPlayers()) do
+                        if p.Character and obj:IsDescendantOf(p.Character) then
+                            isCharacterPart = true
+                            break
+                        end
+                    end
+                    if not isCharacterPart then
+                        OriginalTransparency[obj] = obj.Transparency
+                        obj.Transparency = 0.6
+                    end
+                end
+            end
+        else
+            for obj, trans in pairs(OriginalTransparency) do
+                if obj and obj.Parent then
+                    obj.Transparency = trans
+                end
+            end
+            table.clear(OriginalTransparency)
+        end
+    end
+})
+
+local ESPTab = Window:Tab({
+    Title = "ESP",
+    Icon = "eye",
+})
+
+ESPTab:Section({ Title = "ESP Settings" })
+
+ESPTab:Toggle({
+    Title = "Enable Player ESP (Chams)",
+    Desc = "Toggle wallhack highlights on players.",
+    Default = false,
+    Callback = function(Value)
+        ESP_Enabled = Value
+        if not Value then
+            ClearAllESP()
+        end
+    end
+})
+
+ESPTab:Toggle({
+    Title = "Show Roles (MM2)",
+    Desc = "Color-code roles (Red=Murder, Blue=Sheriff, Green=Innocent).",
+    Default = false,
+    Callback = function(Value) ESP_ShowRoles = Value end
+})
+
+ESPTab:Toggle({
+    Title = "Show Player Names",
+    Desc = "Display name tags above players.",
+    Default = false,
+    Callback = function(Value)
+        ESP_ShowNames = Value
+        if not Value then ClearAllESP() end
+    end
+})
+
+ESPTab:Toggle({
+    Title = "Show Dropped Gun ESP",
+    Desc = "Highlight the dropped sheriff gun on the floor.",
+    Default = false,
+    Callback = function(Value)
+        ESP_ShowGun = Value
+        if not Value then ClearGunESP() end
+    end
+})
+
+local TeleportTab = Window:Tab({
+    Title = "Teleport",
+    Icon = "map-pin",
+})
+
+TeleportTab:Section({ Title = "MM2 Custom Teleports" })
+
+TeleportTab:Button({
+    Title = "Teleport to Lobby",
+    Desc = "Teleport back to the lobby.",
+    Callback = function()
+        local p = Players.LocalPlayer
+        if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            p.Character.HumanoidRootPart.CFrame = CFrame.new(5.51, 506.82, -16.91)
+        end
+    end
+})
+
+TeleportTab:Button({
+    Title = "TP to Murderer",
+    Desc = "Teleport straight to the murderer holding the knife.",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
+        local foundTarget = false
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= lp and p.Character then
+                local hasKnife = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
+                if hasKnife and p.Character:FindFirstChild("HumanoidRootPart") then
+                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+                    foundTarget = true
+                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Murderer!", Duration = 2 })
+                    break
+                end
+            end
+        end
+        if not foundTarget then
+            WindUI:Notify({ Title = "Teleport", Content = "No Murderer found yet.", Duration = 2 })
+        end
+    end
+})
+
+TeleportTab:Button({
+    Title = "TP to Sheriff",
+    Desc = "Teleport straight to the sheriff holding the gun.",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
+        local foundTarget = false
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= lp and p.Character then
+                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
+                if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
+                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+                    foundTarget = true
+                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Sheriff!", Duration = 2 })
+                    break
+                end
+            end
+        end
+        if not foundTarget then
+            WindUI:Notify({ Title = "Teleport", Content = "No Sheriff found yet.", Duration = 2 })
+        end
+    end
+})
+
+TeleportTab:Button({
+    Title = "Teleport to Dropped Gun",
+    Desc = "Instantly teleport to the dropped gun.",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("BasePart") and v.Name == "GunDrop" then
+                lp.Character.HumanoidRootPart.CFrame = v.CFrame * CFrame.new(0, 1, 0)
+                break
+            end
+        end
+    end
 })
 
 local TrollTab = Window:Tab({
@@ -432,198 +627,6 @@ PlayerTab:Toggle({
     Desc = "Allows walking through walls.",
     Default = false,
     Callback = function(Value) Noclip_Enabled = Value end
-})
-
-local FarmTab = Window:Tab({
-    Title = "Auto Farm",
-    Icon = "shopping-cart",
-})
-
-FarmTab:Section({ Title = "Safe Coin Farming" })
-
-FarmTab:Toggle({
-    Title = "Enable Auto Farm Coins",
-    Desc = "Automatically collect coins seamlessly.",
-    Default = false,
-    Callback = function(Value) AutoFarm_Enabled = Value end
-})
-
-FarmTab:Slider({
-    Title = "Farm Tween Speed",
-    Desc = "Recommended: 30. Higher values risk bans.",
-    Value = { Min = 15, Max = 60, Default = 30 },
-    Callback = function(Value) FarmSpeed = Value end
-})
-
-FarmTab:Section({ Title = "Automation" })
-
-FarmTab:Toggle({
-    Title = "Auto Grab Gun",
-    Desc = "Instantly teleport, pick up dropped gun, and return to original position.",
-    Default = false,
-    Callback = function(Value) AutoGrabGun_Enabled = Value end
-})
-
-local TeleportTab = Window:Tab({
-    Title = "Teleport",
-    Icon = "map-pin",
-})
-
-TeleportTab:Section({ Title = "MM2 Custom Teleports" })
-
-TeleportTab:Button({
-    Title = "Teleport to Lobby",
-    Desc = "Teleport back to the lobby.",
-    Callback = function()
-        local p = Players.LocalPlayer
-        if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-            p.Character.HumanoidRootPart.CFrame = CFrame.new(5.51, 506.82, -16.91)
-        end
-    end
-})
-
-TeleportTab:Button({
-    Title = "TP to Murderer",
-    Desc = "Teleport straight to the murderer holding the knife.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        local foundTarget = false
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp and p.Character then
-                local hasKnife = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
-                if hasKnife and p.Character:FindFirstChild("HumanoidRootPart") then
-                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
-                    foundTarget = true
-                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Murderer!", Duration = 2 })
-                    break
-                end
-            end
-        end
-        if not foundTarget then
-            WindUI:Notify({ Title = "Teleport", Content = "No Murderer found yet.", Duration = 2 })
-        end
-    end
-})
-
-TeleportTab:Button({
-    Title = "TP to Sheriff",
-    Desc = "Teleport straight to the sheriff holding the gun.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        local foundTarget = false
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp and p.Character then
-                local hasGun = p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-                if hasGun and p.Character:FindFirstChild("HumanoidRootPart") then
-                    lp.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
-                    foundTarget = true
-                    WindUI:Notify({ Title = "Teleport", Content = "Teleported to Sheriff!", Duration = 2 })
-                    break
-                end
-            end
-        end
-        if not foundTarget then
-            WindUI:Notify({ Title = "Teleport", Content = "No Sheriff found yet.", Duration = 2 })
-        end
-    end
-})
-
-TeleportTab:Button({
-    Title = "Teleport to Dropped Gun",
-    Desc = "Instantly teleport to the dropped gun.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        for _, v in pairs(workspace:GetDescendants()) do
-            if v:IsA("BasePart") and v.Name == "GunDrop" then
-                lp.Character.HumanoidRootPart.CFrame = v.CFrame * CFrame.new(0, 1, 0)
-                break
-            end
-        end
-    end
-})
-
-local ESPTab = Window:Tab({
-    Title = "Visuals / ESP",
-    Icon = "eye",
-})
-
-ESPTab:Section({ Title = "ESP Settings" })
-
-ESPTab:Toggle({
-    Title = "Enable Player ESP (Chams)",
-    Desc = "Toggle wallhack highlights on players.",
-    Default = false,
-    Callback = function(Value)
-        ESP_Enabled = Value
-        if not Value then
-            ClearAllESP()
-        end
-    end
-})
-
-ESPTab:Toggle({
-    Title = "Show Roles (MM2)",
-    Desc = "Color-code roles (Red=Murder, Blue=Sheriff, Green=Innocent).",
-    Default = false,
-    Callback = function(Value) ESP_ShowRoles = Value end
-})
-
-ESPTab:Toggle({
-    Title = "Show Player Names",
-    Desc = "Display name tags above players.",
-    Default = false,
-    Callback = function(Value)
-        ESP_ShowNames = Value
-        if not Value then ClearAllESP() end
-    end
-})
-
-ESPTab:Toggle({
-    Title = "Show Dropped Gun ESP",
-    Desc = "Highlight the dropped sheriff gun on the floor.",
-    Default = false,
-    Callback = function(Value)
-        ESP_ShowGun = Value
-        if not Value then ClearGunESP() end
-    end
-})
-
-ESPTab:Section({ Title = "World Visuals" })
-
-ESPTab:Toggle({
-    Title = "X-Ray (Map Transparency)",
-    Desc = "Makes the entire map semi-transparent excluding players.",
-    Default = false,
-    Callback = function(Value)
-        XRay_Enabled = Value
-        if Value then
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj:IsA("BasePart") then
-                    local isCharacterPart = false
-                    for _, p in pairs(Players:GetPlayers()) do
-                        if p.Character and obj:IsDescendantOf(p.Character) then
-                            isCharacterPart = true
-                            break
-                        end
-                    end
-                    if not isCharacterPart then
-                        OriginalTransparency[obj] = obj.Transparency
-                        obj.Transparency = 0.6
-                    end
-                end
-            end
-        else
-            for obj, trans in pairs(OriginalTransparency) do
-                if obj and obj.Parent then
-                    obj.Transparency = trans
-                end
-            end
-            table.clear(OriginalTransparency)
-        end
-    end
 })
 
 local function GetPlayerRoleColor(player)
@@ -964,4 +967,4 @@ Players.PlayerRemoving:Connect(function(p)
     ClearPlayerESP(p.Name)
 end)
 
-MainTab:Select()
+InformationTab:Select()
