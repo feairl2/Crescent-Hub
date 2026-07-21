@@ -160,6 +160,13 @@ local function pickAllCoins()
             for _, Obj in pairs(itemsFolder:GetChildren()) do
                 if Obj.Name == "Coin Stack" and Obj:IsA("Model") and Obj.PrimaryPart then
                     Obj.PrimaryPart.CFrame = hrp.CFrame
+                    for _, part in ipairs(Obj:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.Anchored = false
+                            part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end
                     count = count + 1
                 end
             end
@@ -207,11 +214,17 @@ task.spawn(function()
                                     if obj:IsA("Model") then
                                         obj:SetPrimaryPartCFrame(CFrame.new(autoCampfireSettings.TargetPosition))
                                         for _, part in ipairs(obj:GetDescendants()) do
-                                            if part:IsA("BasePart") then part.Anchored = false end
+                                            if part:IsA("BasePart") then
+                                                part.Anchored = false
+                                                part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                                part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                                            end
                                         end
                                     elseif obj:IsA("BasePart") then
                                         obj.CFrame = CFrame.new(autoCampfireSettings.TargetPosition)
                                         obj.Anchored = false
+                                        obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                        obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                                     end
                                     break
                                 end
@@ -269,11 +282,17 @@ task.spawn(function()
                                             if obj:IsA("Model") then
                                                 obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
                                                 for _, part in ipairs(obj:GetDescendants()) do
-                                                    if part:IsA("BasePart") then part.Anchored = false end
+                                                    if part:IsA("BasePart") then
+                                                        part.Anchored = false
+                                                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                                                    end
                                                 end
                                             elseif obj:IsA("BasePart") then
                                                 obj.CFrame = CFrame.new(targetPos)
                                                 obj.Anchored = false
+                                                obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                                obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                                             end
                                             break
                                         end
