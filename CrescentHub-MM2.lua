@@ -980,14 +980,12 @@ task.spawn(function()
     end
 end)
 
--- 預先建立好 Pathfinding 物件，避免在迴圈內重複建立降低速度
 local dodgePath = PathfindingService:CreatePath({
     AgentRadius = 2,
     AgentHeight = 5,
     AgentCanJump = true
 })
 
--- 預先生成 24 個 360 度全方位角度列表
 local dodgeAngles = {}
 for i = 0, 345, 15 do
     table.insert(dodgeAngles, i)
@@ -1001,7 +999,6 @@ RunService.Heartbeat:Connect(function()
         for _, p in pairs(lp.Character:GetChildren()) do if p:IsA("BasePart") then p.CanCollide = false end end
     end
 
-    -- 超高速 50 格大範圍路徑搜尋躲避（360度超多角度極速掃描）
     if AutoDodgeMurderer_Enabled and not isDodgeActive and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
         local root = lp.Character.HumanoidRootPart
         local murderer = getMurderer()
@@ -1021,7 +1018,6 @@ RunService.Heartbeat:Connect(function()
                 local maxDistanceFound = -1
                 local rootPos = root.Position
                 
-                -- 快速疊代 24 個角度，搜尋距離直接拉滿到 50 格
                 for _, ang in ipairs(dodgeAngles) do
                     local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
                     local candidatePos = rootPos + (rotatedDir * 50)
@@ -1044,7 +1040,6 @@ RunService.Heartbeat:Connect(function()
                     end
                 end
                 
-                -- 瞬間傳送到最遠安全點，若無則備用彈開
                 if furthestNode then
                     root.CFrame = CFrame.new(furthestNode + Vector3.new(0, 3, 0))
                 else
