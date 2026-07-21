@@ -185,7 +185,7 @@ CombatTab:Section({ Title = "Survival & Evasion" })
 
 CombatTab:Toggle({
     Title = "Auto Dodge Murderer",
-    Desc = "Uses pathfinding to find a safe node, then teleports to the target.",
+    Desc = "Ultra-fast 50-stud 360-degree pathfinding escape scan.",
     Default = false,
     Callback = function(Value) AutoDodgeMurderer_Enabled = Value end
 })
@@ -488,6 +488,9 @@ PlayerTab:Toggle({
             end
             if hum then hum.PlatformStand = false end
             flyVelocity = Vector3.new(0, 0, 0)
+            if root then
+                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            end
         else
             if hum and root then
                 hum.PlatformStand = true
@@ -510,11 +513,13 @@ PlayerTab:Toggle({
                     if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
                     if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
                     
-                    local targetVel = moveDir.Magnitude > 0 and moveDir.Unit * FlySpeed or Vector3.new(0, 0, 0)
-                    flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0, 1, 0) end
                     
-                    currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
-                    currentRoot.CFrame = CFrame.new(currentRoot.Position, currentRoot.Position + camera.CFrame.LookVector)
+                    local targetVel = moveDir.Magnitude > 0 and moveDir.Unit * FlySpeed or Vector3.new(0, 0, 0)
+                    flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 18, 0, 1))
+                    
+                    currentRoot.CFrame = CFrame.new(currentRoot.Position + (flyVelocity * dt)) * (camera.CFrame - camera.CFrame.Position)
                     
                     currentRoot.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                     currentRoot.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
@@ -975,17 +980,18 @@ task.spawn(function()
     end
 end)
 
-local function IsPositionSafe(pos)
-    local rayOrigin = pos + Vector3.new(0, 2, 0)
-    local rayDirection = Vector3.new(0, -15, 0)
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = RaycastFilterType.Exclude
-    if Players.LocalPlayer.Character then
-        raycastParams.FilterDescendantsInstances = {Players.LocalPlayer.Character}
-    end
-    
-    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
-    return raycastResult ~= nil, raycastResult and raycastResult.Position or nil
+-- 預先建立好 Pathfinding 物件，避免在迴圈內重複建立降低速度
+local dodgePath = PathfindingService:CreatePath({
+    AgentRadius = 2,
+    AgentHeight = 5,
+    AgentCanJump = true
+})
+
+-- 預先生成 24 個 360 度全方位角度列表
+local dodgeAngles = {}
+for i = 0, 345, 15 do
+    table.insert(dodgeAngles, i)
+    if i > 0 then table.insert(dodgeAngles, -i) end
 end
 
 RunService.Heartbeat:Connect(function()
@@ -995,6 +1001,7 @@ RunService.Heartbeat:Connect(function()
         for _, p in pairs(lp.Character:GetChildren()) do if p:IsA("BasePart") then p.CanCollide = false end end
     end
 
+    -- 超高速 50 格大範圍路徑搜尋躲避（360度超多角度極速掃描）
     if AutoDodgeMurderer_Enabled and not isDodgeActive and lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
         local root = lp.Character.HumanoidRootPart
         local murderer = getMurderer()
@@ -1003,50 +1010,48 @@ RunService.Heartbeat:Connect(function()
             local murdererHRP = murderer.Character.HumanoidRootPart
             local distance = (root.Position - murdererHRP.Position).Magnitude
             
-            if distance <= 45 then
+            if distance <= 30 then
                 isDodgeActive = true
                 
-                local baseEscapeDir = (root.Position - murdererHRP.Position).Unit
-                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180}
-                local bestTargetPos = nil
-                local maxDistFromMurderer = 0
+                local baseEscapeDir = (root.Position - murdererHRP.Position)
+                baseEscapeDir = Vector3.new(baseEscapeDir.X, 0, baseEscapeDir.Z).Unit
+                if baseEscapeDir.Magnitude == 0 then baseEscapeDir = Vector3.new(1, 0, 0) end
                 
-                local path = PathfindingService:CreatePath({
-                    AgentRadius = 2,
-                    AgentHeight = 5,
-                    AgentCanJump = true
-                })
+                local furthestNode = nil
+                local maxDistanceFound = -1
+                local rootPos = root.Position
                 
-                for _, ang in ipairs(angles) do
+                -- 快速疊代 24 個角度，搜尋距離直接拉滿到 50 格
+                for _, ang in ipairs(dodgeAngles) do
                     local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
-                    local candidatePos = root.Position + (rotatedDir * 40)
+                    local candidatePos = rootPos + (rotatedDir * 50)
                     
                     local success = pcall(function()
-                        path:ComputeAsync(root.Position, candidatePos)
+                        dodgePath:ComputeAsync(rootPos, candidatePos)
                     end)
                     
-                    if success and path.Status == Enum.PathStatus.Success then
-                        local waypoints = path:GetWaypoints()
+                    if success and dodgePath.Status == Enum.PathStatus.Success then
+                        local waypoints = dodgePath:GetWaypoints()
                         if waypoints and #waypoints > 0 then
-                            local safeNodePos = waypoints[#waypoints].Position
+                            local finalNode = waypoints[#waypoints].Position
+                            local distFromCurrent = (rootPos - finalNode).Magnitude
                             
-                            local isSafe, groundPos = IsPositionSafe(safeNodePos)
-                            if isSafe and groundPos then
-                                local distToMurderer = (groundPos - murdererHRP.Position).Magnitude
-                                if distToMurderer > maxDistFromMurderer then
-                                    maxDistFromMurderer = distToMurderer
-                                    bestTargetPos = groundPos
-                                end
+                            if distFromCurrent > maxDistanceFound then
+                                maxDistanceFound = distFromCurrent
+                                furthestNode = finalNode
                             end
                         end
                     end
                 end
                 
-                task.spawn(function()
-                    if bestTargetPos then
-                        root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3.5, 0))
-                    end
-                    task.wait(1.2)
+                -- 瞬間傳送到最遠安全點，若無則備用彈開
+                if furthestNode then
+                    root.CFrame = CFrame.new(furthestNode + Vector3.new(0, 3, 0))
+                else
+                    root.CFrame = CFrame.new(rootPos + (baseEscapeDir * 50) + Vector3.new(0, 3, 0))
+                end
+                
+                task.delay(0.8, function()
                     isDodgeActive = false
                 end)
             end
