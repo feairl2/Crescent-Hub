@@ -35,6 +35,9 @@ local FakeDeath_Enabled = false
 local OriginalCFrame = nil
 local IsFlinging = false
 
+local SelectedPlayerName = ""
+local SelectedFlingPlayerName = ""
+
 local Window = WindUI:CreateWindow({
     Title = "Crescent Hub - MM2",
     Icon = "sparkles",
@@ -120,7 +123,7 @@ CombatTab:Section({ Title = "Sheriff Automation" })
 
 CombatTab:Button({
     Title = "Auto Kill Murderer (As Sheriff)",
-    Desc = "Instantly teleport behind the murderer and shoot him.",
+    Desc = "Switch to 1st person, TP behind murderer, face them, and shoot immediately.",
     Callback = function()
         local lp = Players.LocalPlayer
         local char = lp.Character
@@ -143,9 +146,16 @@ CombatTab:Button({
                 
                 if murderer then
                     local enemyRoot = murderer.Character.HumanoidRootPart
+                    local oldCamMode = lp.CameraMode
+                    
+                    lp.CameraMode = Enum.CameraMode.LockFirstPerson
                     localPlayer_Noclip_Active = true
-                    root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
-                    task.wait(0.1)
+                    
+                    local targetCFrame = CFrame.new(enemyRoot.Position - (enemyRoot.CFrame.LookVector * 2.5), enemyRoot.Position)
+                    root.CFrame = targetCFrame
+                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, enemyRoot.Position)
+                    
+                    task.wait(0.05)
                     
                     if gun.Parent == lp.Backpack then
                         hum:EquipTool(gun)
@@ -158,7 +168,9 @@ CombatTab:Button({
                     
                     task.wait(0.2)
                     localPlayer_Noclip_Active = false
-                    WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer targeted and shot!", Duration = 2 })
+                    lp.CameraMode = oldCamMode
+                    
+                    WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer targeted and shot in First Person!", Duration = 2 })
                 else
                     WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer not found or already dead.", Duration = 2 })
                 end
@@ -211,6 +223,17 @@ TrollTab:Toggle({
 })
 
 TrollTab:Section({ Title = "Fling Controls" })
+
+local function GetPlayerList()
+    local names = {}
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= Players.LocalPlayer then
+            table.insert(names, p.Name)
+        end
+    end
+    if #names == 0 then table.insert(names, "No Other Players") end
+    return names
+end
 
 TrollTab:Button({
     Title = "Fling Murderer",
@@ -332,6 +355,87 @@ TrollTab:Button({
             
             IsFlinging = false
             WindUI:Notify({ Title = "Troll Fling", Content = "Fling Sheriff completed and returned!", Duration = 2 })
+        end)
+    end
+})
+
+TrollTab:Section({ Title = "Targeted Player Fling" })
+
+local FlingPlayerDropdown = TrollTab:Dropdown({
+    Title = "Select Player to Fling",
+    Values = GetPlayerList(),
+    Value = GetPlayerList()[1] or "",
+    Callback = function(Value)
+        SelectedFlingPlayerName = Value
+    end
+})
+
+TrollTab:Button({
+    Title = "Refresh Fling Player List",
+    Desc = "Update the player list dropdown for Fling.",
+    Callback = function()
+        if FlingPlayerDropdown and FlingPlayerDropdown.SetValues then
+            FlingPlayerDropdown:SetValues(GetPlayerList())
+            WindUI:Notify({ Title = "Troll Fling", Content = "Fling player list refreshed!", Duration = 2 })
+        end
+    end
+})
+
+TrollTab:Button({
+    Title = "Fling Target Player",
+    Desc = "Attach to the selected player from dropdown, spin for 10s, then return.",
+    Callback = function()
+        if IsFlinging then return end
+        local lp = Players.LocalPlayer
+        local char = lp.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        
+        if SelectedFlingPlayerName == "" or SelectedFlingPlayerName == "No Other Players" then
+            WindUI:Notify({ Title = "Troll Fling", Content = "Please select a valid player first!", Duration = 2 })
+            return
+        end
+        
+        local targetPlayer = Players:FindFirstChild(SelectedFlingPlayerName)
+        if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            WindUI:Notify({ Title = "Troll Fling", Content = "Target player not found or no character.", Duration = 2 })
+            return
+        end
+        
+        local target = targetPlayer.Character.HumanoidRootPart
+        
+        IsFlinging = true
+        OriginalCFrame = root.CFrame
+        
+        local bav = Instance.new("BodyAngularVelocity")
+        bav.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bav.AngularVelocity = Vector3.new(0, 99999, 0)
+        bav.Parent = root
+        
+        local startTime = tick()
+        local connection
+        connection = RunService.Heartbeat:Connect(function()
+            if target and target.Parent and root and (tick() - startTime < 10) then
+                localPlayer_Noclip_Active = true
+                root.CFrame = target.CFrame * CFrame.new(math.random(-2, 2), math.random(-2, 2), math.random(-2, 2)) * CFrame.Angles(math.random(0, 360), math.random(0, 360), math.random(0, 360))
+            else
+                if connection then connection:Disconnect() end
+            end
+        end)
+        
+        task.delay(10, function()
+            if connection then connection:Disconnect() end
+            if bav then bav:Destroy() end
+            localPlayer_Noclip_Active = false
+            
+            if root and OriginalCFrame then
+                root.CFrame = OriginalCFrame
+                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+            end
+            
+            IsFlinging = false
+            WindUI:Notify({ Title = "Troll Fling", Content = "Fling " .. SelectedFlingPlayerName .. " completed and returned!", Duration = 2 })
         end)
     end
 })
@@ -545,6 +649,49 @@ TeleportTab:Button({
     end
 })
 
+TeleportTab:Section({ Title = "Player Teleportation" })
+
+local PlayerDropdown = TeleportTab:Dropdown({
+    Title = "Select Player to TP",
+    Values = GetPlayerList(),
+    Value = GetPlayerList()[1] or "",
+    Callback = function(Value)
+        SelectedPlayerName = Value
+    end
+})
+
+TeleportTab:Button({
+    Title = "Refresh Player List",
+    Desc = "Update the player list dropdown.",
+    Callback = function()
+        if PlayerDropdown and PlayerDropdown.SetValues then
+            PlayerDropdown:SetValues(GetPlayerList())
+            WindUI:Notify({ Title = "Teleport", Content = "Player list refreshed!", Duration = 2 })
+        end
+    end
+})
+
+TeleportTab:Button({
+    Title = "Teleport to Target Player",
+    Desc = "Teleport to the selected player from dropdown.",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
+        
+        if SelectedPlayerName ~= "" and SelectedPlayerName ~= "No Other Players" then
+            local targetPlayer = Players:FindFirstChild(SelectedPlayerName)
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                lp.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+                WindUI:Notify({ Title = "Teleport", Content = "Teleported to " .. SelectedPlayerName, Duration = 2 })
+            else
+                WindUI:Notify({ Title = "Teleport", Content = "Target player not found or no character.", Duration = 2 })
+            end
+        else
+            WindUI:Notify({ Title = "Teleport", Content = "Please select a valid player first!", Duration = 2 })
+        end
+    end
+})
+
 local ESPTab = Window:Tab({
     Title = "Visuals / ESP",
     Icon = "eye",
@@ -679,6 +826,22 @@ Players.PlayerAdded:Connect(function(player)
         task.wait(0.5)
         ClearPlayerESP(player.Name)
     end)
+    if PlayerDropdown and PlayerDropdown.SetValues then
+        PlayerDropdown:SetValues(GetPlayerList())
+    end
+    if FlingPlayerDropdown and FlingPlayerDropdown.SetValues then
+        FlingPlayerDropdown:SetValues(GetPlayerList())
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(p)
+    ClearPlayerESP(p.Name)
+    if PlayerDropdown and PlayerDropdown.SetValues then
+        PlayerDropdown:SetValues(GetPlayerList())
+    end
+    if FlingPlayerDropdown and FlingPlayerDropdown.SetValues then
+        FlingPlayerDropdown:SetValues(GetPlayerList())
+    end
 end)
 
 for _, player in ipairs(Players:GetPlayers()) do
@@ -812,6 +975,19 @@ task.spawn(function()
     end
 end)
 
+local function IsPositionSafe(pos)
+    local rayOrigin = pos + Vector3.new(0, 2, 0)
+    local rayDirection = Vector3.new(0, -15, 0)
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = RaycastFilterType.Exclude
+    if Players.LocalPlayer.Character then
+        raycastParams.FilterDescendantsInstances = {Players.LocalPlayer.Character}
+    end
+    
+    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+    return raycastResult ~= nil, raycastResult and raycastResult.Position or nil
+end
+
 RunService.Heartbeat:Connect(function()
     local lp = Players.LocalPlayer
     
@@ -853,11 +1029,14 @@ RunService.Heartbeat:Connect(function()
                         local waypoints = path:GetWaypoints()
                         if waypoints and #waypoints > 0 then
                             local safeNodePos = waypoints[#waypoints].Position
-                            local distToMurderer = (safeNodePos - murdererHRP.Position).Magnitude
                             
-                            if distToMurderer > maxDistFromMurderer then
-                                maxDistFromMurderer = distToMurderer
-                                bestTargetPos = safeNodePos
+                            local isSafe, groundPos = IsPositionSafe(safeNodePos)
+                            if isSafe and groundPos then
+                                local distToMurderer = (groundPos - murdererHRP.Position).Magnitude
+                                if distToMurderer > maxDistFromMurderer then
+                                    maxDistFromMurderer = distToMurderer
+                                    bestTargetPos = groundPos
+                                end
                             end
                         end
                     end
@@ -865,11 +1044,8 @@ RunService.Heartbeat:Connect(function()
                 
                 task.spawn(function()
                     if bestTargetPos then
-                        root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3, 0))
-                    else
-                        root.CFrame = root.CFrame + (baseEscapeDir * 30) + Vector3.new(0, 4, 0)
+                        root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3.5, 0))
                     end
-                    
                     task.wait(1.2)
                     isDodgeActive = false
                 end)
@@ -958,10 +1134,6 @@ RunService.Heartbeat:Connect(function()
         end
         if not foundGun then ClearGunESP() end
     end
-end)
-
-Players.PlayerRemoving:Connect(function(p)
-    ClearPlayerESP(p.Name)
 end)
 
 MainTab:Select()
