@@ -19,7 +19,7 @@ local Window = WindUI:CreateWindow({
 })
 
 local globalSettings = {
-    Range = 500,
+    Range = 1000,
     MaxCount = 10,
     Speed = 0.15
 }
@@ -58,9 +58,23 @@ local godModeSettings = {
 
 local killAuraSettings = {
     Enabled = false,
-    Range = 50,
-    Delay = 0.15
+    Range = 70,
+    Delay = 0.1
 }
+
+local treeAuraSettings = {
+    Enabled = false,
+    Range = 1000,
+    Delay = 0.8
+}
+
+local autoDaySettings = {
+    Enabled = false,
+    Radius = 150,
+    Height = 100,
+    Speed = 1
+}
+local autoDayAngle = 0
 
 local playerSettings = {
     WalkSpeedEnabled = false,
@@ -113,10 +127,25 @@ local function executeBring(targetNames)
                     if objPosition then
                         local distance = (objPosition - rootPart.Position).Magnitude
                         if distance <= globalSettings.Range then
+                            local randomOffsetX = math.random(-3, 3)
+                            local randomOffsetZ = math.random(-3, 3)
+                            local randomOffsetY = math.random(1, 4)
+                            local targetCFrame = rootPart.CFrame + Vector3.new(randomOffsetX, randomOffsetY, randomOffsetZ)
+
                             if obj:IsA("Model") then
-                                obj:SetPrimaryPartCFrame(rootPart.CFrame + Vector3.new(0, 3, 0))
+                                obj:SetPrimaryPartCFrame(targetCFrame)
+                                for _, part in ipairs(obj:GetDescendants()) do
+                                    if part:IsA("BasePart") then
+                                        part.Anchored = false
+                                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                                    end
+                                end
                             elseif obj:IsA("BasePart") then
-                                obj.CFrame = rootPart.CFrame + Vector3.new(0, 3, 0)
+                                obj.CFrame = targetCFrame
+                                obj.Anchored = false
+                                obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                             end
 
                             broughtCount = broughtCount + 1
@@ -151,8 +180,12 @@ task.spawn(function()
                                 if distance <= globalSettings.Range then
                                     if obj:IsA("Model") then
                                         obj:SetPrimaryPartCFrame(CFrame.new(autoCampfireSettings.TargetPosition))
+                                        for _, part in ipairs(obj:GetDescendants()) do
+                                            if part:IsA("BasePart") then part.Anchored = false end
+                                        end
                                     elseif obj:IsA("BasePart") then
                                         obj.CFrame = CFrame.new(autoCampfireSettings.TargetPosition)
+                                        obj.Anchored = false
                                     end
                                     break
                                 end
@@ -209,8 +242,12 @@ task.spawn(function()
                                         if distance <= globalSettings.Range then
                                             if obj:IsA("Model") then
                                                 obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                                                for _, part in ipairs(obj:GetDescendants()) do
+                                                    if part:IsA("BasePart") then part.Anchored = false end
+                                                end
                                             elseif obj:IsA("BasePart") then
                                                 obj.CFrame = CFrame.new(targetPos)
+                                                obj.Anchored = false
                                             end
                                             break
                                         end
@@ -410,37 +447,78 @@ end)
 task.spawn(function()
     while true do
         if killAuraSettings.Enabled then
-            local character = LocalPlayer.Character
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                local rootPart = character.HumanoidRootPart
-                
-                for _, model in ipairs(workspace:GetDescendants()) do
-                    if model:IsA("Model") and model ~= character then
-                        local humanoid = model:FindFirstChildOfClass("Humanoid")
-                        local targetRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
-                        
-                        if humanoid and targetRoot and humanoid.Health > 0 then
-                            local isPlayer = false
-                            for _, p in ipairs(Players:GetPlayers()) do
-                                if p.Character == model then
-                                    isPlayer = true
-                                    break
-                                end
-                            end
-                            
-                            if not isPlayer then
-                                local distance = (targetRoot.Position - rootPart.Position).Magnitude
-                                if distance <= killAuraSettings.Range then
-                                    humanoid:TakeDamage(5)
-                                end
-                            end
+            local player = Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local hrp = character:WaitForChild("HumanoidRootPart")
+
+            local weapon = player.Inventory:FindFirstChild("Old Axe")
+                or player.Inventory:FindFirstChild("Good Axe")
+                or player.Inventory:FindFirstChild("Strong Axe")
+                or player.Inventory:FindFirstChild("Chainsaw")
+
+            if weapon then
+                for _, mob in pairs(workspace.Characters:GetChildren()) do
+                    if mob:IsA("Model") and mob.PrimaryPart and mob ~= character then
+                        local distance = (mob.PrimaryPart.Position - hrp.Position).Magnitude
+                        if distance <= killAuraSettings.Range then
+                            game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
+                                mob, weapon, 999, hrp.CFrame
+                            )
                         end
                     end
                 end
             end
-            task.wait(killAuraSettings.Delay)
-        else
-            task.wait(0.2)
+        end
+        task.wait(killAuraSettings.Delay)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if treeAuraSettings.Enabled then
+            local player = Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local hrp = character:WaitForChild("HumanoidRootPart")
+            
+            local weapon = player.Inventory:FindFirstChild("Old Axe") 
+                or player.Inventory:FindFirstChild("Good Axe") 
+                or player.Inventory:FindFirstChild("Strong Axe") 
+                or player.Inventory:FindFirstChild("Chainsaw")
+
+            if weapon then
+                local function chop(folder)
+                    for _, tree in pairs(folder:GetChildren()) do
+                        if tree:IsA("Model") and (tree.Name == "Small Tree" or tree.Name == "TreeBig1" or tree.Name == "TreeBig2") and tree.PrimaryPart then
+                            local distance = (tree.PrimaryPart.Position - hrp.Position).Magnitude
+                            if distance <= treeAuraSettings.Range then
+                                game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
+                                    tree, weapon, 999, hrp.CFrame
+                                )
+                            end
+                        end
+                    end
+                end
+
+                if workspace:FindFirstChild("Map") then
+                    if workspace.Map:FindFirstChild("Foliage") then chop(workspace.Map.Foliage) end
+                    if workspace.Map:FindFirstChild("Landmarks") then chop(workspace.Map.Landmarks) end
+                end
+            end
+        end
+        task.wait(treeAuraSettings.Delay)
+    end
+end)
+
+RunService.RenderStepped:Connect(function(dt)
+    if autoDaySettings.Enabled then
+        local character = LocalPlayer.Character
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            autoDayAngle = autoDayAngle + autoDaySettings.Speed * dt
+            local x = math.cos(autoDayAngle) * autoDaySettings.Radius
+            local z = math.sin(autoDayAngle) * autoDaySettings.Radius
+            local newPos = Vector3.new(x, autoDaySettings.Height, z)
+            hrp.CFrame = CFrame.new(newPos, Vector3.new(0, autoDaySettings.Height, 0))
         end
     end
 end)
@@ -623,6 +701,64 @@ local MainTab = Window:Tab({
 })
 
 MainTab:Section({
+    Title = "Auto Day Settings",
+})
+
+MainTab:Toggle({
+    Title = "Auto Days",
+    Desc = "Circle Tween map",
+    Icon = "star",
+    Default = false,
+    Callback = function(state)
+        autoDaySettings.Enabled = state
+        WindUI:Notify({
+            Title = "Auto Days",
+            Content = state and "Auto Days Enabled" or "Auto Days Disabled",
+            Duration = 2,
+        })
+    end,
+})
+
+MainTab:Slider({
+    Title = "Circle Radius",
+    Step = 10,
+    Value = {
+        Min = 50,
+        Max = 500,
+        Default = 150
+    },
+    Callback = function(value)
+        autoDaySettings.Radius = value
+    end,
+})
+
+MainTab:Slider({
+    Title = "Circle Height",
+    Step = 10,
+    Value = {
+        Min = 10,
+        Max = 300,
+        Default = 100
+    },
+    Callback = function(value)
+        autoDaySettings.Height = value
+    end,
+})
+
+MainTab:Slider({
+    Title = "Circle Speed",
+    Step = 0.1,
+    Value = {
+        Min = 0.1,
+        Max = 5,
+        Default = 1
+    },
+    Callback = function(value)
+        autoDaySettings.Speed = value
+    end,
+})
+
+MainTab:Section({
     Title = "God Mode Settings",
 })
 
@@ -659,7 +795,7 @@ MainTab:Section({
 
 MainTab:Toggle({
     Title = "Enable Kill Aura",
-    Desc = "Continuously damage nearby NPCs until they die smoothly",
+    Desc = "Continuously damage nearby mobs using backend tool events",
     Default = false,
     Callback = function(state)
         killAuraSettings.Enabled = state
@@ -677,7 +813,7 @@ MainTab:Slider({
     Value = {
         Min = 10,
         Max = 200,
-        Default = 50
+        Default = 70
     },
     Callback = function(value)
         killAuraSettings.Range = value
@@ -690,10 +826,54 @@ MainTab:Slider({
     Value = {
         Min = 0.05,
         Max = 2,
-        Default = 0.15
+        Default = 0.1
     },
     Callback = function(value)
         killAuraSettings.Delay = value
+    end,
+})
+
+MainTab:Section({
+    Title = "Tree Aura Settings (Auto Chop)",
+})
+
+MainTab:Toggle({
+    Title = "Enable Tree Aura",
+    Desc = "Automatically chop down nearby trees using axes or chainsaw",
+    Default = false,
+    Callback = function(state)
+        treeAuraSettings.Enabled = state
+        WindUI:Notify({
+            Title = "Tree Aura",
+            Content = state and "Tree Aura Enabled" or "Tree Aura Disabled",
+            Duration = 2,
+        })
+    end,
+})
+
+MainTab:Slider({
+    Title = "Tree Aura Range (Studs)",
+    Step = 50,
+    Value = {
+        Min = 100,
+        Max = 3000,
+        Default = 1000
+    },
+    Callback = function(value)
+        treeAuraSettings.Range = value
+    end,
+})
+
+MainTab:Slider({
+    Title = "Tree Aura Delay (Seconds)",
+    Step = 0.05,
+    Value = {
+        Min = 0.05,
+        Max = 2,
+        Default = 0.8
+    },
+    Callback = function(value)
+        treeAuraSettings.Delay = value
     end,
 })
 
@@ -884,8 +1064,8 @@ BringTab:Slider({
     Step = 10,
     Value = {
         Min = 50,
-        Max = 1000,
-        Default = 500
+        Max = 3000,
+        Default = 1000
     },
     Callback = function(value)
         globalSettings.Range = value
