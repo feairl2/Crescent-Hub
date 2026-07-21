@@ -243,7 +243,7 @@ task.spawn(function()
     end
 end)
 
--- 修改後的自動 Gears 迴圈：一次抓取清單中多個目標（一次5個），並帶入「往上5格、往右0.5格」的偏移量
+-- 自動 Gears：一次抓取最多 5 個，帶入 (0.5, 5, 0) 偏移量
 task.spawn(function()
     local gearNames = {
         ["Bolt"] = true,
@@ -276,7 +276,7 @@ task.spawn(function()
                     end
 
                     if targetPos then
-                        -- 設定目標座標：往上 5 格、往右 0.5 格 (X軸正向代表右，Y軸正向代表上)
+                        -- 往右 0.5 格、往上 5 格
                         targetPos = targetPos + Vector3.new(0.5, 5, 0)
 
                         local matchedGears = {}
@@ -294,7 +294,6 @@ task.spawn(function()
                             end
                         end
 
-                        -- 一次同時處理最多 5 個符合的 Gears
                         local batchCount = 0
                         for _, obj in ipairs(matchedGears) do
                             if batchCount >= 5 then break end
@@ -573,6 +572,17 @@ end)
 local InfoTab = Window:Tab({
     Title = "Information",
     Icon = "info",
+})
+
+-- 在 Information 頁籤最上方加入大圖與文字提示
+InfoTab:Image({
+    Image = "Crescent.png",
+    Height = 180,
+})
+
+InfoTab:Paragraph({
+    Title = "Created by Crescent Team",
+    Desc = "Thank you for using Crescent Hub!",
 })
 
 InfoTab:Section({
