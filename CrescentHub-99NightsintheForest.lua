@@ -27,7 +27,7 @@ local globalSettings = {
 
 local autoCampfireSettings = {
     Enabled = false,
-    Speed = 0.5,
+    Speed = 2.0,
     TargetPosition = Vector3.new(0.3, 11.7, 0.3)
 }
 
@@ -93,6 +93,24 @@ local function pressE()
     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
 end
 
+-- 讓物件解除錨定、清除速度並嘗試恢復正常的通用函數
+local function unfreezeAndFix(obj)
+    if obj:IsA("Model") then
+        for _, part in ipairs(obj:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Anchored = false
+                part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+            end
+        end
+    elseif obj:IsA("BasePart") then
+        obj.Anchored = false
+        obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+        obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+    end
+end
+
+-- 修改後的連續 Bring 函數：同時處理符合條件的所有物件，不逐個等待
 local function executeBring(targetNames)
     local character = LocalPlayer.Character
     if not character or not character:FindFirstChild("HumanoidRootPart") then return end
@@ -103,11 +121,9 @@ local function executeBring(targetNames)
         nameLookup[name] = true
     end
 
-    local broughtCount = 0
+    local matchedObjects = {}
 
     for _, obj in ipairs(workspace:GetDescendants()) do
-        if broughtCount >= globalSettings.MaxCount then break end
-
         if obj:IsA("Model") or obj:IsA("BasePart") then
             if not obj:IsDescendantOf(character) then
                 local objName = obj.Name
@@ -117,34 +133,36 @@ local function executeBring(targetNames)
                     if objPosition then
                         local distance = (objPosition - rootPart.Position).Magnitude
                         if distance <= globalSettings.Range then
-                            local randomOffsetX = math.random(-3, 3)
-                            local randomOffsetZ = math.random(-3, 3)
-                            local randomOffsetY = math.random(1, 4)
-                            local targetCFrame = rootPart.CFrame + Vector3.new(randomOffsetX, randomOffsetY, randomOffsetZ)
-
-                            if obj:IsA("Model") then
-                                obj:SetPrimaryPartCFrame(targetCFrame)
-                                for _, part in ipairs(obj:GetDescendants()) do
-                                    if part:IsA("BasePart") then
-                                        part.Anchored = false
-                                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                    end
-                                end
-                            elseif obj:IsA("BasePart") then
-                                obj.CFrame = targetCFrame
-                                obj.Anchored = false
-                                obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                            end
-
-                            broughtCount = broughtCount + 1
-                            task.wait(globalSettings.Speed)
+                            table.insert(matchedObjects, obj)
                         end
                     end
                 end
             end
         end
+    end
+
+    -- 限制最大數量
+    local count = 0
+    for _, obj in ipairs(matchedObjects) do
+        if count >= globalSettings.MaxCount then break end
+        count = count + 1
+
+        task.spawn(function()
+            local randomOffsetX = math.random(-3, 3)
+            local randomOffsetZ = math.random(-3, 3)
+            local randomOffsetY = math.random(1, 4)
+            local targetCFrame = rootPart.CFrame + Vector3.new(randomOffsetX, randomOffsetY, randomOffsetZ)
+
+            if obj:IsA("Model") and obj.PrimaryPart then
+                obj:SetPrimaryPartCFrame(targetCFrame)
+            elseif obj:IsA("BasePart") then
+                obj.CFrame = targetCFrame
+            end
+
+            unfreezeAndFix(obj)
+        end)
+
+        task.wait(globalSettings.Speed)
     end
 end
 
@@ -160,13 +178,7 @@ local function pickAllCoins()
             for _, Obj in pairs(itemsFolder:GetChildren()) do
                 if Obj.Name == "Coin Stack" and Obj:IsA("Model") and Obj.PrimaryPart then
                     Obj.PrimaryPart.CFrame = hrp.CFrame
-                    for _, part in ipairs(Obj:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            part.Anchored = false
-                            part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                        end
-                    end
+                    unfreezeAndFix(Obj)
                     count = count + 1
                 end
             end
@@ -211,21 +223,12 @@ task.spawn(function()
                             if objPosition then
                                 local distance = (objPosition - character.HumanoidRootPart.Position).Magnitude
                                 if distance <= globalSettings.Range then
-                                    if obj:IsA("Model") then
+                                    if obj:IsA("Model") and obj.PrimaryPart then
                                         obj:SetPrimaryPartCFrame(CFrame.new(autoCampfireSettings.TargetPosition))
-                                        for _, part in ipairs(obj:GetDescendants()) do
-                                            if part:IsA("BasePart") then
-                                                part.Anchored = false
-                                                part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                                part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                            end
-                                        end
                                     elseif obj:IsA("BasePart") then
                                         obj.CFrame = CFrame.new(autoCampfireSettings.TargetPosition)
-                                        obj.Anchored = false
-                                        obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                        obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                                     end
+                                    unfreezeAndFix(obj)
                                     break
                                 end
                             end
@@ -240,6 +243,7 @@ task.spawn(function()
     end
 end)
 
+-- 修改後的自動 Gears 迴圈：一次抓取清單中多個目標（一次5個），並帶入「往上5格、往右0.5格」的偏移量
 task.spawn(function()
     local gearNames = {
         ["Bolt"] = true,
@@ -272,33 +276,38 @@ task.spawn(function()
                     end
 
                     if targetPos then
+                        -- 設定目標座標：往上 5 格、往右 0.5 格 (X軸正向代表右，Y軸正向代表上)
+                        targetPos = targetPos + Vector3.new(0.5, 5, 0)
+
+                        local matchedGears = {}
                         for _, obj in ipairs(workspace:GetDescendants()) do
-                            if autoGearsSettings.Enabled and (obj:IsA("Model") or obj:IsA("BasePart")) then
+                            if (obj:IsA("Model") or obj:IsA("BasePart")) then
                                 if not obj:IsDescendantOf(character) and gearNames[obj.Name] then
                                     local objPosition = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position) or nil
                                     if objPosition then
                                         local distance = (objPosition - character.HumanoidRootPart.Position).Magnitude
                                         if distance <= globalSettings.Range then
-                                            if obj:IsA("Model") then
-                                                obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
-                                                for _, part in ipairs(obj:GetDescendants()) do
-                                                    if part:IsA("BasePart") then
-                                                        part.Anchored = false
-                                                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                                    end
-                                                end
-                                            elseif obj:IsA("BasePart") then
-                                                obj.CFrame = CFrame.new(targetPos)
-                                                obj.Anchored = false
-                                                obj.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                                obj.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                            end
-                                            break
+                                            table.insert(matchedGears, obj)
                                         end
                                     end
                                 end
                             end
+                        end
+
+                        -- 一次同時處理最多 5 個符合的 Gears
+                        local batchCount = 0
+                        for _, obj in ipairs(matchedGears) do
+                            if batchCount >= 5 then break end
+                            batchCount = batchCount + 1
+
+                            task.spawn(function()
+                                if obj:IsA("Model") and obj.PrimaryPart then
+                                    obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                                elseif obj:IsA("BasePart") then
+                                    obj.CFrame = CFrame.new(targetPos)
+                                end
+                                unfreezeAndFix(obj)
+                            end)
                         end
                     end
                 end
@@ -823,7 +832,7 @@ AutoTab:Slider({
     Value = {
         Min = 0.01,
         Max = 5,
-        Default = 0.5
+        Default = 2.0
     },
     Callback = function(value)
         autoCampfireSettings.Speed = value
@@ -836,7 +845,7 @@ AutoTab:Section({
 
 AutoTab:Toggle({
     Title = "Enable Auto Farm Gears",
-    Desc = "Automatically bring Gears to GrindersLeft object",
+    Desc = "Automatically bring multiple Gears to GrindersLeft (+0.5 right, +5 up, batch of 5)",
     Default = false,
     Callback = function(state)
         autoGearsSettings.Enabled = state
