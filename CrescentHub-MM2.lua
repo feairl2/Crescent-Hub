@@ -35,13 +35,10 @@ local FakeDeath_Enabled = false
 local OriginalCFrame = nil
 local IsFlinging = false
 
-local SelectedPlayerName = ""
-local SelectedFlingPlayerName = ""
-
 local Window = WindUI:CreateWindow({
     Title = "Crescent Hub - MM2",
     Icon = "sparkles",
-    Author = "Crescent",
+    Author = "Crescent Team",
     Folder = "CrescentHub",
     Size = UDim2.fromOffset(600, 420),
     Transparent = true,
@@ -123,7 +120,7 @@ CombatTab:Section({ Title = "Sheriff Automation" })
 
 CombatTab:Button({
     Title = "Auto Kill Murderer (As Sheriff)",
-    Desc = "Switch to 1st person, TP behind murderer, face them, and shoot immediately.",
+    Desc = "Instantly teleport behind the murderer and shoot him.",
     Callback = function()
         local lp = Players.LocalPlayer
         local char = lp.Character
@@ -146,16 +143,9 @@ CombatTab:Button({
                 
                 if murderer then
                     local enemyRoot = murderer.Character.HumanoidRootPart
-                    local oldCamMode = lp.CameraMode
-                    
-                    lp.CameraMode = Enum.CameraMode.LockFirstPerson
                     localPlayer_Noclip_Active = true
-                    
-                    local targetCFrame = CFrame.new(enemyRoot.Position - (enemyRoot.CFrame.LookVector * 2.5), enemyRoot.Position)
-                    root.CFrame = targetCFrame
-                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, enemyRoot.Position)
-                    
-                    task.wait(0.05)
+                    root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
+                    task.wait(0.1)
                     
                     if gun.Parent == lp.Backpack then
                         hum:EquipTool(gun)
@@ -168,9 +158,7 @@ CombatTab:Button({
                     
                     task.wait(0.2)
                     localPlayer_Noclip_Active = false
-                    lp.CameraMode = oldCamMode
-                    
-                    WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer targeted and shot in First Person!", Duration = 2 })
+                    WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer targeted and shot!", Duration = 2 })
                 else
                     WindUI:Notify({ Title = "Sheriff Combat", Content = "Murderer not found or already dead.", Duration = 2 })
                 end
@@ -185,7 +173,7 @@ CombatTab:Section({ Title = "Survival & Evasion" })
 
 CombatTab:Toggle({
     Title = "Auto Dodge Murderer",
-    Desc = "Ultra-fast 50-stud 360-degree pathfinding escape scan.",
+    Desc = "Uses pathfinding to find a safe node, then teleports to the target.",
     Default = false,
     Callback = function(Value) AutoDodgeMurderer_Enabled = Value end
 })
@@ -223,17 +211,6 @@ TrollTab:Toggle({
 })
 
 TrollTab:Section({ Title = "Fling Controls" })
-
-local function GetPlayerList()
-    local names = {}
-    for _, p in pairs(Players:GetPlayers()) do
-        if p ~= Players.LocalPlayer then
-            table.insert(names, p.Name)
-        end
-    end
-    if #names == 0 then table.insert(names, "No Other Players") end
-    return names
-end
 
 TrollTab:Button({
     Title = "Fling Murderer",
@@ -359,87 +336,6 @@ TrollTab:Button({
     end
 })
 
-TrollTab:Section({ Title = "Targeted Player Fling" })
-
-local FlingPlayerDropdown = TrollTab:Dropdown({
-    Title = "Select Player to Fling",
-    Values = GetPlayerList(),
-    Value = GetPlayerList()[1] or "",
-    Callback = function(Value)
-        SelectedFlingPlayerName = Value
-    end
-})
-
-TrollTab:Button({
-    Title = "Refresh Fling Player List",
-    Desc = "Update the player list dropdown for Fling.",
-    Callback = function()
-        if FlingPlayerDropdown and FlingPlayerDropdown.SetValues then
-            FlingPlayerDropdown:SetValues(GetPlayerList())
-            WindUI:Notify({ Title = "Troll Fling", Content = "Fling player list refreshed!", Duration = 2 })
-        end
-    end
-})
-
-TrollTab:Button({
-    Title = "Fling Target Player",
-    Desc = "Attach to the selected player from dropdown, spin for 10s, then return.",
-    Callback = function()
-        if IsFlinging then return end
-        local lp = Players.LocalPlayer
-        local char = lp.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
-        
-        if SelectedFlingPlayerName == "" or SelectedFlingPlayerName == "No Other Players" then
-            WindUI:Notify({ Title = "Troll Fling", Content = "Please select a valid player first!", Duration = 2 })
-            return
-        end
-        
-        local targetPlayer = Players:FindFirstChild(SelectedFlingPlayerName)
-        if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            WindUI:Notify({ Title = "Troll Fling", Content = "Target player not found or no character.", Duration = 2 })
-            return
-        end
-        
-        local target = targetPlayer.Character.HumanoidRootPart
-        
-        IsFlinging = true
-        OriginalCFrame = root.CFrame
-        
-        local bav = Instance.new("BodyAngularVelocity")
-        bav.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        bav.AngularVelocity = Vector3.new(0, 99999, 0)
-        bav.Parent = root
-        
-        local startTime = tick()
-        local connection
-        connection = RunService.Heartbeat:Connect(function()
-            if target and target.Parent and root and (tick() - startTime < 10) then
-                localPlayer_Noclip_Active = true
-                root.CFrame = target.CFrame * CFrame.new(math.random(-2, 2), math.random(-2, 2), math.random(-2, 2)) * CFrame.Angles(math.random(0, 360), math.random(0, 360), math.random(0, 360))
-            else
-                if connection then connection:Disconnect() end
-            end
-        end)
-        
-        task.delay(10, function()
-            if connection then connection:Disconnect() end
-            if bav then bav:Destroy() end
-            localPlayer_Noclip_Active = false
-            
-            if root and OriginalCFrame then
-                root.CFrame = OriginalCFrame
-                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-            end
-            
-            IsFlinging = false
-            WindUI:Notify({ Title = "Troll Fling", Content = "Fling " .. SelectedFlingPlayerName .. " completed and returned!", Duration = 2 })
-        end)
-    end
-})
-
 local PlayerTab = Window:Tab({
     Title = "Player",
     Icon = "user",
@@ -488,9 +384,6 @@ PlayerTab:Toggle({
             end
             if hum then hum.PlatformStand = false end
             flyVelocity = Vector3.new(0, 0, 0)
-            if root then
-                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-            end
         else
             if hum and root then
                 hum.PlatformStand = true
@@ -513,13 +406,11 @@ PlayerTab:Toggle({
                     if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
                     if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
                     
-                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0, 1, 0) end
-                    
                     local targetVel = moveDir.Magnitude > 0 and moveDir.Unit * FlySpeed or Vector3.new(0, 0, 0)
-                    flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 18, 0, 1))
+                    flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
                     
-                    currentRoot.CFrame = CFrame.new(currentRoot.Position + (flyVelocity * dt)) * (camera.CFrame - camera.CFrame.Position)
+                    currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
+                    currentRoot.CFrame = CFrame.new(currentRoot.Position, currentRoot.Position + camera.CFrame.LookVector)
                     
                     currentRoot.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                     currentRoot.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
@@ -650,49 +541,6 @@ TeleportTab:Button({
                 lp.Character.HumanoidRootPart.CFrame = v.CFrame * CFrame.new(0, 1, 0)
                 break
             end
-        end
-    end
-})
-
-TeleportTab:Section({ Title = "Player Teleportation" })
-
-local PlayerDropdown = TeleportTab:Dropdown({
-    Title = "Select Player to TP",
-    Values = GetPlayerList(),
-    Value = GetPlayerList()[1] or "",
-    Callback = function(Value)
-        SelectedPlayerName = Value
-    end
-})
-
-TeleportTab:Button({
-    Title = "Refresh Player List",
-    Desc = "Update the player list dropdown.",
-    Callback = function()
-        if PlayerDropdown and PlayerDropdown.SetValues then
-            PlayerDropdown:SetValues(GetPlayerList())
-            WindUI:Notify({ Title = "Teleport", Content = "Player list refreshed!", Duration = 2 })
-        end
-    end
-})
-
-TeleportTab:Button({
-    Title = "Teleport to Target Player",
-    Desc = "Teleport to the selected player from dropdown.",
-    Callback = function()
-        local lp = Players.LocalPlayer
-        if not (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")) then return end
-        
-        if SelectedPlayerName ~= "" and SelectedPlayerName ~= "No Other Players" then
-            local targetPlayer = Players:FindFirstChild(SelectedPlayerName)
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                lp.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
-                WindUI:Notify({ Title = "Teleport", Content = "Teleported to " .. SelectedPlayerName, Duration = 2 })
-            else
-                WindUI:Notify({ Title = "Teleport", Content = "Target player not found or no character.", Duration = 2 })
-            end
-        else
-            WindUI:Notify({ Title = "Teleport", Content = "Please select a valid player first!", Duration = 2 })
         end
     end
 })
@@ -831,22 +679,6 @@ Players.PlayerAdded:Connect(function(player)
         task.wait(0.5)
         ClearPlayerESP(player.Name)
     end)
-    if PlayerDropdown and PlayerDropdown.SetValues then
-        PlayerDropdown:SetValues(GetPlayerList())
-    end
-    if FlingPlayerDropdown and FlingPlayerDropdown.SetValues then
-        FlingPlayerDropdown:SetValues(GetPlayerList())
-    end
-end)
-
-Players.PlayerRemoving:Connect(function(p)
-    ClearPlayerESP(p.Name)
-    if PlayerDropdown and PlayerDropdown.SetValues then
-        PlayerDropdown:SetValues(GetPlayerList())
-    end
-    if FlingPlayerDropdown and FlingPlayerDropdown.SetValues then
-        FlingPlayerDropdown:SetValues(GetPlayerList())
-    end
 end)
 
 for _, player in ipairs(Players:GetPlayers()) do
@@ -980,18 +812,6 @@ task.spawn(function()
     end
 end)
 
-local dodgePath = PathfindingService:CreatePath({
-    AgentRadius = 2,
-    AgentHeight = 5,
-    AgentCanJump = true
-})
-
-local dodgeAngles = {}
-for i = 0, 345, 15 do
-    table.insert(dodgeAngles, i)
-    if i > 0 then table.insert(dodgeAngles, -i) end
-end
-
 RunService.Heartbeat:Connect(function()
     local lp = Players.LocalPlayer
     
@@ -1007,46 +827,50 @@ RunService.Heartbeat:Connect(function()
             local murdererHRP = murderer.Character.HumanoidRootPart
             local distance = (root.Position - murdererHRP.Position).Magnitude
             
-            if distance <= 30 then
+            if distance <= 45 then
                 isDodgeActive = true
                 
-                local baseEscapeDir = (root.Position - murdererHRP.Position)
-                baseEscapeDir = Vector3.new(baseEscapeDir.X, 0, baseEscapeDir.Z).Unit
-                if baseEscapeDir.Magnitude == 0 then baseEscapeDir = Vector3.new(1, 0, 0) end
+                local baseEscapeDir = (root.Position - murdererHRP.Position).Unit
+                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180}
+                local bestTargetPos = nil
+                local maxDistFromMurderer = 0
                 
-                local furthestNode = nil
-                local maxDistanceFound = -1
-                local rootPos = root.Position
+                local path = PathfindingService:CreatePath({
+                    AgentRadius = 2,
+                    AgentHeight = 5,
+                    AgentCanJump = true
+                })
                 
-                for _, ang in ipairs(dodgeAngles) do
+                for _, ang in ipairs(angles) do
                     local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
-                    local candidatePos = rootPos + (rotatedDir * 50)
+                    local candidatePos = root.Position + (rotatedDir * 40)
                     
                     local success = pcall(function()
-                        dodgePath:ComputeAsync(rootPos, candidatePos)
+                        path:ComputeAsync(root.Position, candidatePos)
                     end)
                     
-                    if success and dodgePath.Status == Enum.PathStatus.Success then
-                        local waypoints = dodgePath:GetWaypoints()
+                    if success and path.Status == Enum.PathStatus.Success then
+                        local waypoints = path:GetWaypoints()
                         if waypoints and #waypoints > 0 then
-                            local finalNode = waypoints[#waypoints].Position
-                            local distFromCurrent = (rootPos - finalNode).Magnitude
+                            local safeNodePos = waypoints[#waypoints].Position
+                            local distToMurderer = (safeNodePos - murdererHRP.Position).Magnitude
                             
-                            if distFromCurrent > maxDistanceFound then
-                                maxDistanceFound = distFromCurrent
-                                furthestNode = finalNode
+                            if distToMurderer > maxDistFromMurderer then
+                                maxDistFromMurderer = distToMurderer
+                                bestTargetPos = safeNodePos
                             end
                         end
                     end
                 end
                 
-                if furthestNode then
-                    root.CFrame = CFrame.new(furthestNode + Vector3.new(0, 3, 0))
-                else
-                    root.CFrame = CFrame.new(rootPos + (baseEscapeDir * 50) + Vector3.new(0, 3, 0))
-                end
-                
-                task.delay(0.8, function()
+                task.spawn(function()
+                    if bestTargetPos then
+                        root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3, 0))
+                    else
+                        root.CFrame = root.CFrame + (baseEscapeDir * 30) + Vector3.new(0, 4, 0)
+                    end
+                    
+                    task.wait(1.2)
                     isDodgeActive = false
                 end)
             end
@@ -1134,6 +958,10 @@ RunService.Heartbeat:Connect(function()
         end
         if not foundGun then ClearGunESP() end
     end
+end)
+
+Players.PlayerRemoving:Connect(function(p)
+    ClearPlayerESP(p.Name)
 end)
 
 MainTab:Select()
