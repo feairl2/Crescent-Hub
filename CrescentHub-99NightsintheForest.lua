@@ -10,7 +10,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local Window = WindUI:CreateWindow({
     Title = "Crescent Hub - 99 Nights in the Forest",
-    Icon = "sparkles",
+    Icon = "https://crescent-ds7.pages.dev/Crescent Logo.png",
     Author = "Crescent Team",
     Folder = "CrescentHub",
     Transparent = true,
@@ -574,9 +574,9 @@ local InfoTab = Window:Tab({
     Icon = "info",
 })
 
--- 在 Information 頁籤最上方加入大圖與文字提示
+-- 在 Information 頁籤最上方加入遠端大圖與文字提示
 InfoTab:Image({
-    Image = "Crescent.png",
+    Image = "https://crescent-ds7.pages.dev/Crescent.png",
     Height = 180,
 })
 
