@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 
 local Window = WindUI:CreateWindow({
@@ -35,20 +36,9 @@ local autoGearsSettings = {
     Speed = 0.1
 }
 
-local autoFlowerSettings = {
-    Enabled = false,
-    MaxCount = 10,
-    Speed = 0.2
-}
-
-local autoCoinsSettings = {
-    Enabled = false,
-    MaxCount = 10,
-    Speed = 0.2
-}
-
 local autoEatSettings = {
-    Enabled = false
+    Enabled = false,
+    Threshold = 90
 }
 
 local godModeSettings = {
@@ -64,7 +54,7 @@ local killAuraSettings = {
 
 local treeAuraSettings = {
     Enabled = false,
-    Range = 1000,
+    Range = 100,
     Delay = 0.8
 }
 
@@ -155,6 +145,42 @@ local function executeBring(targetNames)
                 end
             end
         end
+    end
+end
+
+local function pickAllCoins()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if hrp then
+        local itemsFolder = game.workspace:FindFirstChild("Items")
+        if itemsFolder then
+            local count = 0
+            for _, Obj in pairs(itemsFolder:GetChildren()) do
+                if Obj.Name == "Coin Stack" and Obj:IsA("Model") and Obj.PrimaryPart then
+                    Obj.PrimaryPart.CFrame = hrp.CFrame
+                    count = count + 1
+                end
+            end
+            WindUI:Notify({
+                Title = "Pick All Coins",
+                Content = "Successfully collected " .. count .. " coin stacks!",
+                Duration = 2,
+            })
+        else
+            WindUI:Notify({
+                Title = "Pick All Coins",
+                Content = "Workspace.Items not found!",
+                Duration = 2,
+            })
+        end
+    else
+        WindUI:Notify({
+            Title = "Pick All Coins",
+            Content = "Character not found!",
+            Duration = 2,
+        })
     end
 end
 
@@ -275,172 +301,32 @@ task.spawn(function()
         ["Mackerel"] = true,
         ["Salmon"] = true,
         ["Swordfish"] = true,
-        ["Berry"] = true
+        ["Berry"] = true,
+        ["Cooked Morsel"] = true
     }
 
-    while true do
-        if autoEatSettings.Enabled then
-            local character = LocalPlayer.Character
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                local rootPart = character.HumanoidRootPart
-                local originalCFrame = rootPart.CFrame
-                local foundFood = false
+    local requestConsume = ReplicatedStorage:WaitForChild("RemoteEvents", 5) and ReplicatedStorage.RemoteEvents:WaitForChild("RequestConsumeItem", 5)
+    
+    local success, hungryBar = pcall(function()
+        return LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Interface")
+            :WaitForChild("StatBars"):WaitForChild("HungerBar"):WaitForChild("Bar")
+    end)
 
-                for _, obj in ipairs(workspace:GetDescendants()) do
-                    if not autoEatSettings.Enabled then break end
-
-                    if obj:IsA("Model") or obj:IsA("BasePart") then
-                        if not obj:IsDescendantOf(character) then
-                            local objName = obj.Name
-                            if foodNames[objName] then
-                                local objPosition = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position) or nil
-                                
-                                if objPosition then
-                                    local distance = (objPosition - originalCFrame.Position).Magnitude
-                                    if distance <= globalSettings.Range then
-                                        if obj:IsA("Model") and obj.PrimaryPart then
-                                            rootPart.CFrame = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
-                                        elseif obj:IsA("BasePart") then
-                                            rootPart.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                                        end
-                                        
-                                        task.wait(0.1)
-                                        pressE()
-                                        task.wait(0.15)
-                                        
-                                        rootPart.CFrame = originalCFrame
-                                        foundFood = true
-                                        break
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                
-                if not foundFood then
-                    task.wait(2)
-                else
-                    task.wait(2)
-                end
-            else
-                task.wait(1)
-            end
-        else
-            task.wait(1)
-        end
-    end
-end)
-
-task.spawn(function()
-    local flowerNames = {
-        ["Flower"] = true,
-        ["Blue Flower"] = true,
-        ["Red Flower"] = true,
-        ["Yellow Flower"] = true,
-        ["Wild Flower"] = true,
-        ["White Flower"] = true
-    }
-
-    while true do
-        if autoFlowerSettings.Enabled then
-            local character = LocalPlayer.Character
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                local rootPart = character.HumanoidRootPart
-                local processedCount = 0
-
-                for _, obj in ipairs(workspace:GetDescendants()) do
-                    if not autoFlowerSettings.Enabled then break end
-                    if processedCount >= autoFlowerSettings.MaxCount then break end
-
-                    if obj:IsA("Model") or obj:IsA("BasePart") then
-                        if not obj:IsDescendantOf(character) then
-                            local objName = obj.Name
-                            local isFlower = flowerNames[objName] or string.find(string.lower(objName), "flower")
-                            
-                            if isFlower then
-                                local objPosition = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position) or nil
-                                
-                                if objPosition then
-                                    local distance = (objPosition - rootPart.Position).Magnitude
-                                    if distance <= globalSettings.Range then
-                                        if obj:IsA("Model") and obj.PrimaryPart then
-                                            rootPart.CFrame = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
-                                        elseif obj:IsA("BasePart") then
-                                            rootPart.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                                        end
-                                        
-                                        task.wait(0.1)
-                                        pressE()
-                                        
-                                        processedCount = processedCount + 1
-                                        task.wait(autoFlowerSettings.Speed)
-                                    end
-                                end
-                            end
+    if success and hungryBar and requestConsume then
+        hungryBar:GetPropertyChangedSignal("Size"):Connect(function()
+            if autoEatSettings.Enabled then
+                if hungryBar.Size.X.Scale < (autoEatSettings.Threshold / 100) then
+                    for _, item in ipairs(workspace:GetDescendants()) do
+                        if foodNames[item.Name] then
+                            pcall(function()
+                                requestConsume:InvokeServer(item)
+                            end)
+                            break
                         end
                     end
                 end
             end
-            task.wait(0.5)
-        else
-            task.wait(0.2)
-        end
-    end
-end)
-
-task.spawn(function()
-    local coinNames = {
-        ["Coin"] = true,
-        ["Coins"] = true,
-        ["Gold Coin"] = true,
-        ["Silver Coin"] = true
-    }
-
-    while true do
-        if autoCoinsSettings.Enabled then
-            local character = LocalPlayer.Character
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                local rootPart = character.HumanoidRootPart
-                local processedCount = 0
-
-                for _, obj in ipairs(workspace:GetDescendants()) do
-                    if not autoCoinsSettings.Enabled then break end
-                    if processedCount >= autoCoinsSettings.MaxCount then break end
-
-                    if obj:IsA("Model") or obj:IsA("BasePart") then
-                        if not obj:IsDescendantOf(character) then
-                            local objName = obj.Name
-                            local isCoin = coinNames[objName] or string.find(string.lower(objName), "coin") or string.find(string.lower(objName), "cash")
-                            
-                            if isCoin then
-                                local objPosition = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position) or nil
-                                
-                                if objPosition then
-                                    local distance = (objPosition - rootPart.Position).Magnitude
-                                    if distance <= globalSettings.Range then
-                                        if obj:IsA("Model") and obj.PrimaryPart then
-                                            rootPart.CFrame = obj.PrimaryPart.CFrame + Vector3.new(0, 3, 0)
-                                        elseif obj:IsA("BasePart") then
-                                            rootPart.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                                        end
-                                        
-                                        task.wait(0.1)
-                                        pressE()
-                                        
-                                        processedCount = processedCount + 1
-                                        task.wait(autoCoinsSettings.Speed)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-            task.wait(0.5)
-        else
-            task.wait(0.2)
-        end
+        end)
     end
 end)
 
@@ -759,6 +645,18 @@ MainTab:Slider({
 })
 
 MainTab:Section({
+    Title = "Pick All Coins",
+})
+
+MainTab:Button({
+    Title = "Pick All Coins",
+    Desc = "Click once to teleport all Coin Stacks to player",
+    Callback = function()
+        pickAllCoins()
+    end,
+})
+
+MainTab:Section({
     Title = "God Mode Settings",
 })
 
@@ -853,11 +751,11 @@ MainTab:Toggle({
 
 MainTab:Slider({
     Title = "Tree Aura Range (Studs)",
-    Step = 50,
+    Step = 10,
     Value = {
-        Min = 100,
-        Max = 3000,
-        Default = 1000
+        Min = 10,
+        Max = 100,
+        Default = 100
     },
     Callback = function(value)
         treeAuraSettings.Range = value
@@ -950,7 +848,7 @@ AutoTab:Section({
 
 AutoTab:Toggle({
     Title = "Enable Auto Eat",
-    Desc = "Automatically teleport to a random food item, press E to eat, and return back",
+    Desc = "Automatically eat food when hunger is below threshold",
     Default = false,
     Callback = function(state)
         autoEatSettings.Enabled = state
@@ -962,91 +860,16 @@ AutoTab:Toggle({
     end,
 })
 
-AutoTab:Section({
-    Title = "Auto Flower Settings",
-})
-
-AutoTab:Toggle({
-    Title = "Enable Auto Flower",
-    Desc = "Automatically teleport to flowers, press E, and collect them",
-    Default = false,
-    Callback = function(state)
-        autoFlowerSettings.Enabled = state
-        WindUI:Notify({
-            Title = "Auto Flower",
-            Content = state and "Auto Flower Enabled" or "Auto Flower Disabled",
-            Duration = 2,
-        })
-    end,
-})
-
 AutoTab:Slider({
-    Title = "Flower Max Count",
+    Title = "Eat Hunger Threshold (%)",
     Step = 1,
     Value = {
-        Min = 1,
-        Max = 50,
-        Default = 10
+        Min = 10,
+        Max = 100,
+        Default = 90
     },
     Callback = function(value)
-        autoFlowerSettings.MaxCount = value
-    end,
-})
-
-AutoTab:Slider({
-    Title = "Flower Speed (Delay)",
-    Step = 0.05,
-    Value = {
-        Min = 0.05,
-        Max = 2,
-        Default = 0.2
-    },
-    Callback = function(value)
-        autoFlowerSettings.Speed = value
-    end,
-})
-
-AutoTab:Section({
-    Title = "Auto Pick Coins Settings",
-})
-
-AutoTab:Toggle({
-    Title = "Enable Auto Pick Coins",
-    Desc = "Automatically teleport to coins, press E, and collect them",
-    Default = false,
-    Callback = function(state)
-        autoCoinsSettings.Enabled = state
-        WindUI:Notify({
-            Title = "Auto Pick Coins",
-            Content = state and "Auto Pick Coins Enabled" or "Auto Pick Coins Disabled",
-            Duration = 2,
-        })
-    end,
-})
-
-AutoTab:Slider({
-    Title = "Coins Max Count",
-    Step = 1,
-    Value = {
-        Min = 1,
-        Max = 50,
-        Default = 10
-    },
-    Callback = function(value)
-        autoCoinsSettings.MaxCount = value
-    end,
-})
-
-AutoTab:Slider({
-    Title = "Coins Speed (Delay)",
-    Step = 0.05,
-    Value = {
-        Min = 0.05,
-        Max = 2,
-        Default = 0.2
-    },
-    Callback = function(value)
-        autoCoinsSettings.Speed = value
+        autoEatSettings.Threshold = value
     end,
 })
 
@@ -1077,7 +900,7 @@ BringTab:Slider({
     Step = 1,
     Value = {
         Min = 1,
-        Max = 50,
+        Max = 100,
         Default = 10
     },
     Callback = function(value)
@@ -1519,6 +1342,7 @@ MiscTab:Slider({
 
 MiscTab:Slider({
     Title = "Clock Time (Sun Hour)",
+    Tag = "Clock Time",
     Step = 1,
     Value = {
         Min = 0,
@@ -1535,7 +1359,7 @@ MiscTab:Section({
 })
 
 MiscTab:Toggle({
-    Title = "Enable Player Glow",
+    Title = "Enable Auto Eat",
     Desc = "Attach a custom light source around your character",
     Default = false,
     Callback = function(state)
