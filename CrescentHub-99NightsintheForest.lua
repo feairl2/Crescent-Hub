@@ -93,7 +93,6 @@ local function pressE()
     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
 end
 
--- 讓物件解除錨定、清除速度並嘗試恢復正常的通用函數
 local function unfreezeAndFix(obj)
     if obj:IsA("Model") then
         for _, part in ipairs(obj:GetDescendants()) do
@@ -110,7 +109,6 @@ local function unfreezeAndFix(obj)
     end
 end
 
--- 修改後的連續 Bring 函數：同時處理符合條件的所有物件，不逐個等待
 local function executeBring(targetNames)
     local character = LocalPlayer.Character
     if not character or not character:FindFirstChild("HumanoidRootPart") then return end
@@ -141,7 +139,6 @@ local function executeBring(targetNames)
         end
     end
 
-    -- 限制最大數量
     local count = 0
     for _, obj in ipairs(matchedObjects) do
         if count >= globalSettings.MaxCount then break end
@@ -243,7 +240,6 @@ task.spawn(function()
     end
 end)
 
--- 自動 Gears：一次抓取最多 5 個，帶入 (0.5, 5, 0) 偏移量
 task.spawn(function()
     local gearNames = {
         ["Bolt"] = true,
@@ -276,7 +272,6 @@ task.spawn(function()
                     end
 
                     if targetPos then
-                        -- 往右 0.5 格、往上 5 格
                         targetPos = targetPos + Vector3.new(0.5, 5, 0)
 
                         local matchedGears = {}
@@ -574,7 +569,6 @@ local InfoTab = Window:Tab({
     Icon = "info",
 })
 
--- 在 Information 頁籤最上方加入遠端大圖與文字提示
 InfoTab:Image({
     Image = "https://crescent-ds7.pages.dev/Crescent.png",
     Height = 180,
