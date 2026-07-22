@@ -34,8 +34,8 @@ local autoGearsSettings = {
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
 local killAuraSettings = { Enabled = false, Range = 150, Delay = 0.1 }
-local treeAuraSettings = { Enabled = false, Range = 100 }
-local autoDaySettings = { Enabled = false, Radius = 150, Height = 100, Speed = 1 }
+local treeAuraSettings = { Enabled = false, Range = 150 }
+local autoDaySettings = { Enabled = false, Radius = 100, Height = 100, Speed = 1 }
 local autoDayAngle = 0
 
 local playerSettings = {
@@ -543,9 +543,9 @@ AutoTab:Section({ Title = "Auto Campfire Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Campfire", Default = false, Callback = function(s) autoCampfireSettings.Enabled = s end })
 AutoTab:Slider({ Title = "Feed Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 2.0 }, Callback = function(v) autoCampfireSettings.Speed = v end })
 
-AutoTab:Section({ Title = "Auto Farm Gears Settings" })
-AutoTab:Toggle({ Title = "Enable Auto Farm Gears", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
-AutoTab:Slider({ Title = "Gears Farm Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 0.1 }, Callback = function(v) autoGearsSettings.Speed = v end })
+AutoTab:Section({ Title = "Auto Farm Workspace Settings" })
+AutoTab:Toggle({ Title = "Enable Auto Farm Workspace", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
+AutoTab:Slider({ Title = "Workspace Farm Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 0.1 }, Callback = function(v) autoGearsSettings.Speed = v end })
 
 AutoTab:Section({ Title = "Auto Eat Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Eat", Default = false, Callback = function(s) autoEatSettings.Enabled = s end })
