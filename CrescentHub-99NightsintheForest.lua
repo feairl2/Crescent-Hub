@@ -19,8 +19,8 @@ local Window = WindUI:CreateWindow({
     Size = UDim2.fromOffset(600, 440),
 })
 
-local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15 }
-local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.3, 5, 0.3) }
+local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15, BringDestination = "玩家" }
+local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(20.9, 6.2, -5.4) }
 local autoGearsSettings = { Enabled = false, Speed = 0.1 }
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
@@ -119,10 +119,6 @@ local function getNearbyTargetObjects(targetNamesTable, radius)
 end
 
 local function executeBring(targetNames)
-    local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-    local rootPart = character.HumanoidRootPart
-
     local nameLookup = {}
     for _, name in ipairs(targetNames) do nameLookup[name] = true end
 
@@ -134,13 +130,25 @@ local function executeBring(targetNames)
         count = count + 1
 
         task.spawn(function()
-            local targetCFrame = rootPart.CFrame + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
-            if obj:IsA("Model") and obj.PrimaryPart then
-                obj:SetPrimaryPartCFrame(targetCFrame)
-            elseif obj:IsA("BasePart") then
-                obj.CFrame = targetCFrame
+            local targetCFrame
+            if globalSettings.BringDestination == "玩家" then
+                local character = LocalPlayer.Character
+                if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+                targetCFrame = character.HumanoidRootPart.CFrame + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
+            elseif globalSettings.BringDestination == "工作臺" then
+                targetCFrame = CFrame.new(20.9, 6.2, -5.4) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
+            elseif globalSettings.BringDestination == "營火" then
+                targetCFrame = CFrame.new(0.5, 8.4, 0.3) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
             end
-            unfreezeAndFix(obj)
+
+            if targetCFrame then
+                if obj:IsA("Model") and obj.PrimaryPart then
+                    obj:SetPrimaryPartCFrame(targetCFrame)
+                elseif obj:IsA("BasePart") then
+                    obj.CFrame = targetCFrame
+                end
+                unfreezeAndFix(obj)
+            end
         end)
         task.wait(globalSettings.Speed)
     end
@@ -572,6 +580,7 @@ AutoTab:Slider({ Title = "Eat Hunger Threshold (%)", Step = 1, Value = { Min = 1
 
 local BringTab = Window:Tab({ Title = "Bring", Icon = "navigation" })
 BringTab:Section({ Title = "Global Bring Settings" })
+BringTab:Dropdown({ Title = "Bring Destination", Values = {"玩家", "工作臺", "營火"}, Value = "玩家", Callback = function(v) globalSettings.BringDestination = v end })
 BringTab:Slider({ Title = "Range (Studs)", Step = 10, Value = { Min = 50, Max = 3000, Default = 2000 }, Callback = function(v) globalSettings.Range = v end })
 BringTab:Slider({ Title = "Max Count", Step = 1, Value = { Min = 1, Max = 500, Default = 100 }, Callback = function(v) globalSettings.MaxCount = v end })
 BringTab:Slider({ Title = "Speed (Delay)", Step = 0.01, Value = { Min = 0.01, Max = 1, Default = 0.15 }, Callback = function(v) globalSettings.Speed = v end })
