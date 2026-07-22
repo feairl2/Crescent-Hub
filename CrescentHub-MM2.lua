@@ -19,7 +19,7 @@ local Fly_Enabled = false
 local FlySpeed = 30
 local FlyConnection = nil
 local flyVelocity = Vector3.new(0, 0, 0)
-local lockedY = nil
+local lockedFlyY = nil --[cite: 1] 記錄飛行時鎖定的Y軸高度
 
 local AutoFarm_Enabled = false
 local FarmSpeed = 30
@@ -562,12 +562,12 @@ PlayerTab:Toggle({
             end
             if hum then hum.PlatformStand = false end
             flyVelocity = Vector3.new(0, 0, 0)
-            lockedY = nil
+            lockedFlyY = nil
         else
             if hum and root then
                 hum.PlatformStand = true
                 flyVelocity = Vector3.new(0, 0, 0)
-                lockedY = root.Position.Y
+                lockedFlyY = root.Position.Y --[cite: 1] 初始化飛行時的高度
                 
                 if FlyConnection then FlyConnection:Disconnect() end
                 
@@ -581,22 +581,25 @@ PlayerTab:Toggle({
                     local camera = workspace.CurrentCamera
                     
                     local moveDir = Vector3.new(0, 0, 0)
-                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + camera.CFrame.LookVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - camera.CFrame.LookVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
+                    local isMoving = false
                     
-                    if moveDir.Magnitude > 0 then
-                        lockedY = nil
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + camera.CFrame.LookVector; isMoving = true end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - camera.CFrame.LookVector; isMoving = true end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector; isMoving = true end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector; isMoving = true end
+                    
+                    if isMoving then
+                        lockedFlyY = currentRoot.Position.Y --[cite: 1] 移動時計錄當前Y軸
                         local targetVel = moveDir.Unit * FlySpeed
                         flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
                         currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
                     else
-                        flyVelocity = Vector3.new(0, 0, 0)
-                        if not lockedY then
-                            lockedY = currentRoot.Position.Y
+                        flyVelocity = flyVelocity:Lerp(Vector3.new(0, 0, 0), math.clamp(dt * 15, 0, 1))
+                        --[cite: 1] 放開WASD時，鎖住Y軸以免掉下去
+                        if lockedFlyY then
+                            local pos = currentRoot.Position
+                            currentRoot.CFrame = CFrame.new(pos.X, lockedFlyY, pos.Z) * (currentRoot.CFrame - pos)
                         end
-                        currentRoot.CFrame = CFrame.new(Vector3.new(currentRoot.Position.X, lockedY, currentRoot.Position.Z), currentRoot.Position + camera.CFrame.LookVector)
                     end
                     
                     currentRoot.CFrame = CFrame.new(currentRoot.Position, currentRoot.Position + camera.CFrame.LookVector)
@@ -841,7 +844,7 @@ RunService.Heartbeat:Connect(function()
                 isDodgeActive = true
                 
                 local baseEscapeDir = (root.Position - murdererHRP.Position).Unit
-                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180, 210, -210, 240, -240, 270, -270, 300, -300, 330, -330}
+                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180}
                 local bestTargetPos = nil
                 local maxDistFromMurderer = 0
                 
@@ -853,7 +856,7 @@ RunService.Heartbeat:Connect(function()
                 
                 for _, ang in ipairs(angles) do
                     local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
-                    local candidatePos = root.Position + (rotatedDir * 45)
+                    local candidatePos = root.Position + (rotatedDir * 40)
                     
                     local success = pcall(function()
                         path:ComputeAsync(root.Position, candidatePos)
@@ -877,7 +880,7 @@ RunService.Heartbeat:Connect(function()
                     if bestTargetPos then
                         root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3, 0))
                     else
-                        root.CFrame = root.CFrame + (baseEscapeDir * 35) + Vector3.new(0, 4, 0)
+                        root.CFrame = root.CFrame + (baseEscapeDir * 30) + Vector3.new(0, 4, 0)
                     end
                     
                     task.wait(1.2)
@@ -971,7 +974,6 @@ RunService.Heartbeat:Connect(function()
 end)
 
 Players.PlayerRemoving:Connect(function(p)
-    CurrentESP_Clear = nil
     ClearPlayerESP(p.Name)
 end)
 
