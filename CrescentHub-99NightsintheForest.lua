@@ -1,4 +1,4 @@
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()[cite: 1]
 local TweenService = game:GetService("TweenService")
 
 local Players = game:GetService("Players")
@@ -26,6 +26,7 @@ local Window = WindUI:CreateWindow({
 
 local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15, BringDestination = "Player" }
 local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.5, 15.0, 0.3) }
+local autoCookSettings = { Enabled = false, Speed = 2.0 }
 local autoGearsSettings = { 
     Enabled = false, 
     Speed = 0.1, 
@@ -294,6 +295,44 @@ task.spawn(function()
 end)
 
 task.spawn(function()
+    local cookItemNames = {
+        ["Morsel"] = true,
+        ["Steak"] = true
+    }
+    while true do
+        if autoCookSettings.Enabled then
+            local matchedCookItems = getNearbyTargetObjects(cookItemNames, globalSettings.Range)
+
+            for i = 1, math.min(#matchedCookItems, 5) do
+                local obj = matchedCookItems[i]
+                task.spawn(function()
+                    local targetPos = Vector3.new(0.5, 15.0, 0.3)
+                    local angle = math.random() * math.pi * 2
+                    local distance = math.random() * 3
+                    local offset = Vector3.new(math.cos(angle) * distance, 0, math.sin(angle) * distance)
+                    local finalPos = targetPos + offset
+
+                    if obj:IsA("Model") and obj.PrimaryPart then
+                        requestDrag:FireServer(obj)
+                        task.wait(0.1)
+                        obj:PivotTo(CFrame.new(finalPos))
+                        task.wait(0.1)
+                        stopDrag:FireServer(obj)
+                    elseif obj:IsA("BasePart") then
+                        obj.CFrame = CFrame.new(finalPos)
+                    end
+                    unfreezeAndFix(obj)
+                end)
+                task.wait(0.05)
+            end
+            task.wait(autoCookSettings.Speed)
+        else
+            task.wait(0.2)
+        end
+    end
+end)
+
+task.spawn(function()
     local gearNames = {
         ["Bolt"] = true, ["Tyre"] = true, ["Sheet Metal"] = true, ["Old Radio"] = true, ["Broken Fan"] = true,
         ["Broken Microwave"] = true, ["Washing Machine"] = true, ["Old Car Engine"] = true, ["UFO Scrap"] = true,
@@ -542,6 +581,10 @@ local AutoTab = Window:Tab({ Title = "Auto", Icon = "refresh-cw" })
 AutoTab:Section({ Title = "Auto Campfire Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Campfire", Default = false, Callback = function(s) autoCampfireSettings.Enabled = s end })
 AutoTab:Slider({ Title = "Feed Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 2.0 }, Callback = function(v) autoCampfireSettings.Speed = v end })
+
+AutoTab:Section({ Title = "Auto Cook Settings" })
+AutoTab:Toggle({ Title = "Enable Auto Cook", Default = false, Callback = function(s) autoCookSettings.Enabled = s end })
+AutoTab:Slider({ Title = "Cook Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 2.0 }, Callback = function(v) autoCookSettings.Speed = v end })
 
 AutoTab:Section({ Title = "Auto Farm Workspace Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Farm Workspace", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
