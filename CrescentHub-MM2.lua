@@ -730,12 +730,14 @@ end)
 
 task.spawn(function()
     local killedTargets = {}
-    
+    local playerSpawnTimes = {}
+
     while true do
         task.wait(0.1)
         
         if not KillAll_Enabled then
             table.clear(killedTargets)
+            table.clear(playerSpawnTimes)
         else
             local lp = Players.LocalPlayer
             local char = lp.Character
@@ -746,6 +748,7 @@ task.spawn(function()
                 local knife = lp:FindFirstChild("Backpack") and lp.Backpack:FindFirstChild("Knife") or char:FindFirstChild("Knife")
                 if knife then
                     local allCleared = true
+                    local activeEnemyCount = 0
                     
                     for _, enemy in pairs(Players:GetPlayers()) do
                         if not KillAll_Enabled then break end
@@ -753,41 +756,51 @@ task.spawn(function()
                         if enemy ~= lp and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") and enemy.Character:FindFirstChild("Humanoid") then
                             local enemyHum = enemy.Character.Humanoid
                             
-                            if enemyHum.Health > 0 and not killedTargets[enemy.Name] then
-                                allCleared = false
-                                local enemyRoot = enemy.Character.HumanoidRootPart
+                            if enemyHum.Health > 0 then
+                                activeEnemyCount = activeEnemyCount + 1
                                 
-                                localPlayer_Noclip_Active = true
-                                root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
-                                task.wait(0.1)
-                                
-                                if knife.Parent == lp.Backpack then
-                                    hum:EquipTool(knife)
+                                local currentSpawnId = enemy.Character
+                                if playerSpawnTimes[enemy.Name] ~= currentSpawnId then
+                                    playerSpawnTimes[enemy.Name] = currentSpawnId
+                                    killedTargets[enemy.Name] = nil
                                 end
                                 
-                                local startTime = tick()
-                                while KillAll_Enabled and enemy.Parent and enemyHum.Health > 0 and (tick() - startTime < 3) do
-                                    VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                                    task.wait(0.05)
-                                    VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                                    task.wait(0.15)
+                                if not killedTargets[enemy.Name] then
+                                    allCleared = false
+                                    local enemyRoot = enemy.Character.HumanoidRootPart
                                     
-                                    if enemyRoot and root then
-                                        root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
+                                    localPlayer_Noclip_Active = true
+                                    root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
+                                    task.wait(0.1)
+                                    
+                                    if knife.Parent == lp.Backpack then
+                                        hum:EquipTool(knife)
                                     end
+                                    
+                                    local startTime = tick()
+                                    while KillAll_Enabled and enemy.Parent and enemyHum.Health > 0 and (tick() - startTime < 3) do
+                                        VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                                        task.wait(0.05)
+                                        VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                                        task.wait(0.15)
+                                        
+                                        if enemyRoot and root then
+                                            root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
+                                        end
+                                    end
+                                    
+                                    if enemyHum.Health <= 0 then
+                                        killedTargets[enemy.Name] = true
+                                    end
+                                    
+                                    localPlayer_Noclip_Active = false
+                                    task.wait(0.2)
                                 end
-                                
-                                if enemyHum.Health <= 0 then
-                                    killedTargets[enemy.Name] = true
-                                end
-                                
-                                localPlayer_Noclip_Active = false
-                                task.wait(0.2)
                             end
                         end
                     end
                     
-                    if allCleared then
+                    if allCleared or activeEnemyCount == 0 then
                         table.clear(killedTargets)
                         task.wait(1)
                     end
