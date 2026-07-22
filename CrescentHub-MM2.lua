@@ -19,7 +19,7 @@ local Fly_Enabled = false
 local FlySpeed = 30
 local FlyConnection = nil
 local flyVelocity = Vector3.new(0, 0, 0)
-local lockedFlyY = nil --[cite: 1] 記錄飛行時鎖定的Y軸高度
+local lockedFlyY = nil 
 
 local AutoFarm_Enabled = false
 local FarmSpeed = 30
@@ -567,7 +567,7 @@ PlayerTab:Toggle({
             if hum and root then
                 hum.PlatformStand = true
                 flyVelocity = Vector3.new(0, 0, 0)
-                lockedFlyY = root.Position.Y --[cite: 1] 初始化飛行時的高度
+                lockedFlyY = root.Position.Y 
                 
                 if FlyConnection then FlyConnection:Disconnect() end
                 
@@ -589,13 +589,12 @@ PlayerTab:Toggle({
                     if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector; isMoving = true end
                     
                     if isMoving then
-                        lockedFlyY = currentRoot.Position.Y --[cite: 1] 移動時計錄當前Y軸
+                        lockedFlyY = currentRoot.Position.Y 
                         local targetVel = moveDir.Unit * FlySpeed
                         flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
                         currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
                     else
                         flyVelocity = flyVelocity:Lerp(Vector3.new(0, 0, 0), math.clamp(dt * 15, 0, 1))
-                        --[cite: 1] 放開WASD時，鎖住Y軸以免掉下去
                         if lockedFlyY then
                             local pos = currentRoot.Position
                             currentRoot.CFrame = CFrame.new(pos.X, lockedFlyY, pos.Z) * (currentRoot.CFrame - pos)
