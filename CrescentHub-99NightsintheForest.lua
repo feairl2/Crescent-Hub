@@ -339,18 +339,6 @@ task.spawn(function()
     local logChairNames = {
         ["Log"] = true, ["Chair"] = true
     }
-    local othersNames = {
-        ["Alien Battery"] = true, ["Crystal Skull Key"] = true, ["Poison Claws"] = true, ["Gears"] = true,
-        ["Impact Grenade"] = true, ["Acorn"] = true, ["Christmas Lights"] = true, ["Scythe"] = true,
-        ["Obsidiron Hammer"] = true, ["Purple Fur Tuft"] = true, ["Halloween Candle"] = true, ["Candy"] = true,
-        ["Frog Key"] = true, ["Feather"] = true, ["Wildfire"] = true, ["Sacrifice Totem"] = true,
-        ["Old Rod"] = true, ["Flower"] = true, ["Coin Stack"] = true, ["Infernal Sack"] = true,
-        ["Giant Sack"] = true, ["Good Sack"] = true, ["Seed Box"] = true, ["Chainsaw"] = true,
-        ["Old Flashlight"] = true, ["Strong Flashlight"] = true, ["Bunny Foot"] = true, ["Wolf Pelt"] = true,
-        ["Bear Pelt"] = true, ["Mammoth Tusk"] = true, ["Alpha Wolf Pelt"] = true, ["Bear Corpse"] = true,
-        ["Meteor Shard"] = true, ["Gold Shard"] = true, ["Raw Obsidiron Ore"] = true,
-        ["Gem of the Forest Fragment"] = true, ["Diamond"] = true, ["Defense Blueprint"] = true
-    }
     
     while true do
         if autoGearsSettings.Enabled then
@@ -360,8 +348,6 @@ task.spawn(function()
                 local currentTargets = gearNames
                 if autoGearsSettings.Mode == "Log/Chair" then
                     currentTargets = logChairNames
-                elseif autoGearsSettings.Mode == "Others" then
-                    currentTargets = othersNames
                 end
                 
                 local matchedObjects = getNearbyTargetObjects(currentTargets, globalSettings.Range)
@@ -609,7 +595,7 @@ AutoTab:Slider({ Title = "Cook Feed Delay (Seconds)", Step = 0.05, Value = { Min
 
 AutoTab:Section({ Title = "Auto Farm Workspace Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Farm Workspace", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
-AutoTab:Dropdown({ Title = "Workspace Farm Target", Values = {"Gears", "Log/Chair", "Others"}, Value = "Gears", Callback = function(v) autoGearsSettings.Mode = v end })
+AutoTab:Dropdown({ Title = "Workspace Farm Target", Values = {"Gears", "Log/Chair"}, Value = "Gears", Callback = function(v) autoGearsSettings.Mode = v end })
 AutoTab:Slider({ Title = "Workspace Farm Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 0.1 }, Callback = function(v) autoGearsSettings.Speed = v end })
 
 AutoTab:Section({ Title = "Auto Eat Settings" })
