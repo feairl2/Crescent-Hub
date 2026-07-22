@@ -20,9 +20,12 @@ local Window = WindUI:CreateWindow({
 })
 
 local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15, BringDestination = "Player" }
--- 已將 TargetPosition 改為 Campfire 的座標 (0.5, 8.4, 0.3)
 local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.5, 8.4, 0.3) }
-local autoGearsSettings = { Enabled = false, Speed = 0.1 }
+local autoGearsSettings = { 
+    Enabled = false, 
+    Speed = 0.1, 
+    TargetPosition = Vector3.new(20.9, 6.2, -5.4)
+}
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
 local killAuraSettings = { Enabled = false, Range = 150, Delay = 0.1 }
@@ -320,35 +323,32 @@ task.spawn(function()
     }
     while true do
         if autoGearsSettings.Enabled then
-            local targetGrinder = workspace:FindFirstChild("GrindersLeft", true)
-            if targetGrinder then
-                local targetPos = (targetGrinder:IsA("Model") and targetGrinder.PrimaryPart and targetGrinder.PrimaryPart.Position) or (targetGrinder:IsA("BasePart") and targetGrinder.Position)
-                if targetPos then
-                    targetPos = targetPos + Vector3.new(0.5, 0, 0)
-                    local matchedGears = getNearbyTargetObjects(gearNames, globalSettings.Range)
+            local targetPos = autoGearsSettings.TargetPosition
+            
+            if targetPos then
+                local matchedGears = getNearbyTargetObjects(gearNames, globalSettings.Range)
 
-                    for i = 1, math.min(#matchedGears, 5) do
-                        local obj = matchedGears[i]
-                        task.spawn(function()
-                            local startPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
-                            
-                            if obj:IsA("Model") and obj.PrimaryPart then
-                                obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
-                            elseif obj:IsA("BasePart") then
-                                obj.CFrame = CFrame.new(targetPos)
-                            end
-                            unfreezeAndFix(obj)
+                for i = 1, math.min(#matchedGears, 5) do
+                    local obj = matchedGears[i]
+                    task.spawn(function()
+                        local startPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
+                        
+                        if obj:IsA("Model") and obj.PrimaryPart then
+                            obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                        elseif obj:IsA("BasePart") then
+                            obj.CFrame = CFrame.new(targetPos)
+                        end
+                        unfreezeAndFix(obj)
 
-                            task.wait(0.5)
-                            if obj and obj.Parent then
-                                local newPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
-                                if newPos and startPos and (newPos - startPos).Magnitude < 1 then
-                                    forceUnstuck(obj)
-                                end
+                        task.wait(0.5)
+                        if obj and obj.Parent then
+                            local newPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
+                            if newPos and startPos and (newPos - startPos).Magnitude < 1 then
+                                forceUnstuck(obj)
                             end
-                        end)
-                        task.wait(0.05)
-                    end
+                        end
+                    end)
+                    task.wait(0.05)
                 end
             end
             task.wait(autoGearsSettings.Speed)
