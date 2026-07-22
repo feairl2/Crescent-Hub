@@ -37,10 +37,10 @@ local IsFlinging = false
 
 local Window = WindUI:CreateWindow({
     Title = "Crescent Hub - MM2",
-    Icon = "sparkles",
+    Icon = "https://crescent-ds7.pages.dev/Crescent Logo.png",
     Author = "Crescent Team",
     Folder = "CrescentHub",
-    Size = UDim2.fromOffset(600, 420),
+    Size = UDim2.fromOffset(600, 440),
     Transparent = true,
     Theme = "Dark",
     SideBarWidth = 200,
@@ -75,30 +75,12 @@ local function ClearGunESP()
     table.clear(GunESPContainer)
 end
 
-local InformationTab = Window:Tab({
-    Title = "Information",
-    Icon = "info",
-})
-
+local InformationTab = Window:Tab({ Title = "Information", Icon = "info" })
+InformationTab:Image({ Image = "https://crescent-ds7.pages.dev/Crescent.png", Height = 180 })
+InformationTab:Paragraph({ Title = "Created by Crescent Team", Desc = "Thank you for using Crescent Hub!" })
 InformationTab:Section({ Title = "Community & Links" })
-
-InformationTab:Button({
-    Title = "Website",
-    Desc = "Click to copy the official website link",
-    Callback = function()
-        if setclipboard then setclipboard("https://crescent-ds7.pages.dev/") end
-        WindUI:Notify({ Title = "Crescent Hub", Content = "Website link copied!", Duration = 2 })
-    end
-})
-
-InformationTab:Button({
-    Title = "Discord",
-    Desc = "Click to copy the Discord invite link",
-    Callback = function()
-        if setclipboard then setclipboard("https://discord.gg/sy4R8MbDAQ") end
-        WindUI:Notify({ Title = "Crescent Hub", Content = "Discord link copied!", Duration = 2 })
-    end
-})
+InformationTab:Button({ Title = "Website", Desc = "Click to copy link", Callback = function() if setclipboard then setclipboard("https://crescent-ds7.pages.dev/") end end })
+InformationTab:Button({ Title = "Discord", Desc = "Click to copy link", Callback = function() if setclipboard then setclipboard("https://discord.gg/sy4R8MbDAQ") end end })
 
 local CombatTab = Window:Tab({
     Title = "Combat",
