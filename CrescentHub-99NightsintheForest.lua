@@ -1,4 +1,5 @@
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+local TweenService = game:GetService("TweenService")
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -7,6 +8,10 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
+
+local rs = ReplicatedStorage:WaitForChild("RemoteEvents")
+local requestDrag = rs:WaitForChild("RequestStartDraggingItem")
+local stopDrag = rs:WaitForChild("StopDraggingItem")
 
 local Window = WindUI:CreateWindow({
     Title = "Crescent Hub - 99 Nights in the Forest",
@@ -20,7 +25,7 @@ local Window = WindUI:CreateWindow({
 })
 
 local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15, BringDestination = "Player" }
-local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.5, 8.4, 0.3) }
+local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.5, 15.0, 0.3) }
 local autoGearsSettings = { 
     Enabled = false, 
     Speed = 0.1, 
@@ -66,31 +71,6 @@ local function unfreezeAndFix(obj)
         obj.Anchored = false
         obj.AssemblyLinearVelocity = Vector3.zero
         obj.AssemblyAngularVelocity = Vector3.zero
-    end
-end
-
-local function forceUnstuck(obj)
-    if not obj or not obj.Parent then return end
-    
-    local parts = {}
-    if obj:IsA("Model") then
-        for _, p in ipairs(obj:GetDescendants()) do
-            if p:IsA("BasePart") then table.insert(parts, p) end
-        end
-    elseif obj:IsA("BasePart") then
-        table.insert(parts, obj)
-    end
-
-    for _, part in ipairs(parts) do
-        part.Anchored = true
-    end
-
-    task.wait(0.05)
-
-    for _, part in ipairs(parts) do
-        part.Anchored = false
-        part.AssemblyLinearVelocity = Vector3.new(0, -30, 0)
-        part.AssemblyAngularVelocity = Vector3.zero
     end
 end
 
@@ -142,12 +122,16 @@ local function executeBring(targetNames)
             elseif globalSettings.BringDestination == "WorkSpace" then
                 targetCFrame = CFrame.new(20.9, 6.2, -5.4) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
             elseif globalSettings.BringDestination == "Campfire" then
-                targetCFrame = CFrame.new(0.5, 8.4, 0.3) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
+                targetCFrame = CFrame.new(0.5, 15.0, 0.3) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
             end
 
             if targetCFrame then
                 if obj:IsA("Model") and obj.PrimaryPart then
-                    obj:SetPrimaryPartCFrame(targetCFrame)
+                    requestDrag:FireServer(obj)
+                    task.wait(0.1)
+                    obj:PivotTo(targetCFrame)
+                    task.wait(0.1)
+                    stopDrag:FireServer(obj)
                 elseif obj:IsA("BasePart") then
                     obj.CFrame = targetCFrame
                 end
@@ -289,22 +273,16 @@ task.spawn(function()
             for i = 1, math.min(#matchedFuels, 5) do
                 local obj = matchedFuels[i]
                 task.spawn(function()
-                    local startPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
-                    
                     if obj:IsA("Model") and obj.PrimaryPart then
-                        obj:SetPrimaryPartCFrame(CFrame.new(autoCampfireSettings.TargetPosition))
+                        requestDrag:FireServer(obj)
+                        task.wait(0.1)
+                        obj:PivotTo(CFrame.new(autoCampfireSettings.TargetPosition))
+                        task.wait(0.1)
+                        stopDrag:FireServer(obj)
                     elseif obj:IsA("BasePart") then
                         obj.CFrame = CFrame.new(autoCampfireSettings.TargetPosition)
                     end
                     unfreezeAndFix(obj)
-
-                    task.wait(0.5)
-                    if obj and obj.Parent then
-                        local newPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
-                        if newPos and startPos and (newPos - startPos).Magnitude < 1 then
-                            forceUnstuck(obj)
-                        end
-                    end
                 end)
                 task.wait(0.05)
             end
@@ -331,22 +309,16 @@ task.spawn(function()
                 for i = 1, math.min(#matchedGears, 5) do
                     local obj = matchedGears[i]
                     task.spawn(function()
-                        local startPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
-                        
                         if obj:IsA("Model") and obj.PrimaryPart then
-                            obj:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                            requestDrag:FireServer(obj)
+                            task.wait(0.1)
+                            obj:PivotTo(CFrame.new(targetPos))
+                            task.wait(0.1)
+                            stopDrag:FireServer(obj)
                         elseif obj:IsA("BasePart") then
                             obj.CFrame = CFrame.new(targetPos)
                         end
                         unfreezeAndFix(obj)
-
-                        task.wait(0.5)
-                        if obj and obj.Parent then
-                            local newPos = (obj:IsA("Model") and obj.PrimaryPart and obj.PrimaryPart.Position) or (obj:IsA("BasePart") and obj.Position)
-                            if newPos and startPos and (newPos - startPos).Magnitude < 1 then
-                                forceUnstuck(obj)
-                            end
-                        end
                     end)
                     task.wait(0.05)
                 end
