@@ -20,7 +20,8 @@ local Window = WindUI:CreateWindow({
 })
 
 local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15, BringDestination = "Player" }
-local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(20.9, 6.2, -5.4) }
+-- 已將 TargetPosition 改為 Campfire 的座標 (0.5, 8.4, 0.3)
+local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.5, 8.4, 0.3) }
 local autoGearsSettings = { Enabled = false, Speed = 0.1 }
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
