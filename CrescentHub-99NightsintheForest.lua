@@ -36,7 +36,7 @@ local autoGearsSettings = {
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
 local killAuraSettings = { Enabled = false, Range = 150, Delay = 0.1 }
-local treeAuraSettings = { Enabled = false, Range = 150 } 
+local treeAuraSettings = { Enabled = false, Range = 150 }
 local autoDaySettings = { Enabled = false, Radius = 100, Height = 100, Speed = 1 }
 local autoDayAngle = 0
 
@@ -339,13 +339,31 @@ task.spawn(function()
     local logChairNames = {
         ["Log"] = true, ["Chair"] = true
     }
+    local othersNames = {
+        ["Alien Battery"] = true, ["Crystal Skull Key"] = true, ["Poison Claws"] = true, ["Gears"] = true,
+        ["Impact Grenade"] = true, ["Acorn"] = true, ["Christmas Lights"] = true, ["Scythe"] = true,
+        ["Obsidiron Hammer"] = true, ["Purple Fur Tuft"] = true, ["Halloween Candle"] = true, ["Candy"] = true,
+        ["Frog Key"] = true, ["Feather"] = true, ["Wildfire"] = true, ["Sacrifice Totem"] = true,
+        ["Old Rod"] = true, ["Flower"] = true, ["Coin Stack"] = true, ["Infernal Sack"] = true,
+        ["Giant Sack"] = true, ["Good Sack"] = true, ["Seed Box"] = true, ["Chainsaw"] = true,
+        ["Old Flashlight"] = true, ["Strong Flashlight"] = true, ["Bunny Foot"] = true, ["Wolf Pelt"] = true,
+        ["Bear Pelt"] = true, ["Mammoth Tusk"] = true, ["Alpha Wolf Pelt"] = true, ["Bear Corpse"] = true,
+        ["Meteor Shard"] = true, ["Gold Shard"] = true, ["Raw Obsidiron Ore"] = true,
+        ["Gem of the Forest Fragment"] = true, ["Diamond"] = true, ["Defense Blueprint"] = true
+    }
     
     while true do
         if autoGearsSettings.Enabled then
             local targetPos = autoGearsSettings.TargetPosition
             
             if targetPos then
-                local currentTargets = (autoGearsSettings.Mode == "Log/Chair") and logChairNames or gearNames
+                local currentTargets = gearNames
+                if autoGearsSettings.Mode == "Log/Chair" then
+                    currentTargets = logChairNames
+                elseif autoGearsSettings.Mode == "Others" then
+                    currentTargets = othersNames
+                end
+                
                 local matchedObjects = getNearbyTargetObjects(currentTargets, globalSettings.Range)
 
                 for i = 1, math.min(#matchedObjects, 5) do
@@ -591,7 +609,7 @@ AutoTab:Slider({ Title = "Cook Feed Delay (Seconds)", Step = 0.05, Value = { Min
 
 AutoTab:Section({ Title = "Auto Farm Workspace Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Farm Workspace", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
-AutoTab:Dropdown({ Title = "Workspace Farm Target", Values = {"Gears", "Log/Chair"}, Value = "Gears", Callback = function(v) autoGearsSettings.Mode = v end })
+AutoTab:Dropdown({ Title = "Workspace Farm Target", Values = {"Gears", "Log/Chair", "Others"}, Value = "Gears", Callback = function(v) autoGearsSettings.Mode = v end })
 AutoTab:Slider({ Title = "Workspace Farm Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 0.1 }, Callback = function(v) autoGearsSettings.Speed = v end })
 
 AutoTab:Section({ Title = "Auto Eat Settings" })
@@ -612,6 +630,7 @@ local bringCategories = {
     {"Bring Food", {"Sweet Potato", "Stuffing", "Turkey Leg", "Carrot", "Pumpkin", "Mackerel", "Salmon", "Swordfish", "Berry", "Ribs", "Stew", "Steak Dinner", "Morsel", "Steak", "Corn", "Cooked Morsel", "Cooked Steak", "Chilli", "Apple", "Cake"}, {"Sweet Potato", "Stuffing", "Turkey Leg", "Carrot", "Pumpkin", "Mackerel", "Salmon", "Swordfish", "Berry", "Ribs", "Stew", "Steak Dinner", "Morsel", "Steak", "Corn", "Cooked Morsel", "Cooked Steak", "Chilli", "Apple", "Cake"}},
     {"Bring Healing", {"MedKit", "Bandage"}, {"MedKit", "Bandage"}},
     {"Bring Gears", {"Bolt", "Tyre", "Sheet Metal", "Old Radio", "Broken Fan", "Broken Microwave", "Washing Machine", "Old Car Engine", "UFO Scrap", "UFO Component", "UFO Junk", "Cultist Gem", "Gem of the Forest"}, {"Bolt", "Tyre", "Sheet Metal", "Old Radio", "Broken Fan", "Broken Microwave", "Washing Machine", "Old Car Engine", "UFO Scrap", "UFO Component", "UFO Junk", "Cultist Gem", "Gem of the Forest"}},
+    {"Bring Others", {"Alien Battery", "Crystal Skull Key", "Poison Claws", "Gears", "Impact Grenade", "Acorn", "Christmas Lights", "Scythe", "Obsidiron Hammer", "Purple Fur Tuft", "Halloween Candle", "Candy", "Frog Key", "Feather", "Wildfire", "Sacrifice Totem", "Old Rod", "Flower", "Coin Stack", "Infernal Sack", "Giant Sack", "Good Sack", "Seed Box", "Chainsaw", "Old Flashlight", "Strong Flashlight", "Bunny Foot", "Wolf Pelt", "Bear Pelt", "Mammoth Tusk", "Alpha Wolf Pelt", "Bear Corpse", "Meteor Shard", "Gold Shard", "Raw Obsidiron Ore", "Gem of the Forest Fragment", "Diamond", "Defense Blueprint"}, {"Alien Battery", "Crystal Skull Key", "Poison Claws", "Gears", "Impact Grenade", "Acorn", "Christmas Lights", "Scythe", "Obsidiron Hammer", "Purple Fur Tuft", "Halloween Candle", "Candy", "Frog Key", "Feather", "Wildfire", "Sacrifice Totem", "Old Rod", "Flower", "Coin Stack", "Infernal Sack", "Giant Sack", "Good Sack", "Seed Box", "Chainsaw", "Old Flashlight", "Strong Flashlight", "Bunny Foot", "Wolf Pelt", "Bear Pelt", "Mammoth Tusk", "Alpha Wolf Pelt", "Bear Corpse", "Meteor Shard", "Gold Shard", "Raw Obsidiron Ore", "Gem of the Forest Fragment", "Diamond", "Defense Blueprint"}},
     {"Bring Guns & Armor", {"Infernal Sword", "Morningstar", "Crossbow", "Infernal Crossbow", "Laser Sword", "Raygun", "Ice Axe", "Ice Sword", "Chainsaw", "Strong Axe", "Axe Trim Kit", "Spear", "Good Axe", "Revolver", "Air Rifle", "Rifle", "Tactical Shotgun", "Revolver Ammo", "Rifle Ammo", "Alien Armour", "Frog Boots", "Leather Body", "Iron Body", "Thorn Body", "Riot Shield"}, {"Infernal Sword", "Morningstar", "Crossbow", "Infernal Crossbow", "Laser Sword", "Raygun", "Ice Axe", "Ice Sword", "Chainsaw", "Strong Axe", "Axe Trim Kit", "Spear", "Good Axe", "Revolver", "Air Rifle", "Rifle", "Tactical Shotgun", "Revolver Ammo", "Rifle Ammo", "Alien Armour", "Frog Boots", "Leather Body", "Iron Body", "Thorn Body", "Riot Shield"}}
 }
 
@@ -637,6 +656,7 @@ local categoriesData = {
     ["Food"] = {"Sweet Potato", "Stuffing", "Turkey Leg", "Carrot", "Pumpkin", "Mackerel", "Salmon", "Swordfish", "Berry", "Ribs", "Stew", "Steak Dinner", "Morsel", "Steak", "Corn", "Cooked Morsel", "Cooked Steak", "Chilli", "Apple", "Cake"},
     ["Healing"] = {"MedKit", "Bandage"},
     ["Gears"] = {"Bolt", "Tyre", "Sheet Metal", "Old Radio", "Broken Fan", "Broken Microwave", "Washing Machine", "Old Car Engine", "UFO Scrap", "UFO Component", "UFO Junk", "Cultist Gem", "Gem of the Forest"},
+    ["Others"] = {"Alien Battery", "Crystal Skull Key", "Poison Claws", "Gears", "Impact Grenade", "Acorn", "Christmas Lights", "Scythe", "Obsidiron Hammer", "Purple Fur Tuft", "Halloween Candle", "Candy", "Frog Key", "Feather", "Wildfire", "Sacrifice Totem", "Old Rod", "Flower", "Coin Stack", "Infernal Sack", "Giant Sack", "Good Sack", "Seed Box", "Chainsaw", "Old Flashlight", "Strong Flashlight", "Bunny Foot", "Wolf Pelt", "Bear Pelt", "Mammoth Tusk", "Alpha Wolf Pelt", "Bear Corpse", "Meteor Shard", "Gold Shard", "Raw Obsidiron Ore", "Gem of the Forest Fragment", "Diamond", "Defense Blueprint"},
     ["Guns & Armor"] = {"Infernal Sword", "Morningstar", "Crossbow", "Infernal Crossbow", "Laser Sword", "Raygun", "Ice Axe", "Ice Sword", "Chainsaw", "Strong Axe", "Axe Trim Kit", "Spear", "Good Axe", "Revolver", "Air Rifle", "Rifle", "Tactical Shotgun", "Revolver Ammo", "Rifle Ammo", "Alien Armour", "Frog Boots", "Leather Body", "Iron Body", "Thorn Body", "Riot Shield"}
 }
 
