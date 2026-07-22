@@ -235,7 +235,7 @@ task.spawn(function()
                     shouldShow = true
                     labelName = "Tree"
                     labelColor = Color3.fromRGB(0, 255, 0)
-                elseif espSettings.Rabbits and name == "Rabbit" then
+                elseif espSettings.Rabbits and name == "Bunny" then
                     shouldShow = true
                     labelName = "Rabbit"
                     labelColor = Color3.fromRGB(255, 192, 203)
