@@ -20,7 +20,7 @@ local Window = WindUI:CreateWindow({
 })
 
 local globalSettings = { Range = 2000, MaxCount = 100, Speed = 0.15 }
-local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.3, 11.7, 0.3) }
+local autoCampfireSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector3.new(0.3, 5, 0.3) }
 local autoGearsSettings = { Enabled = false, Speed = 0.1 }
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
@@ -315,7 +315,7 @@ task.spawn(function()
             if targetGrinder then
                 local targetPos = (targetGrinder:IsA("Model") and targetGrinder.PrimaryPart and targetGrinder.PrimaryPart.Position) or (targetGrinder:IsA("BasePart") and targetGrinder.Position)
                 if targetPos then
-                    targetPos = targetPos + Vector3.new(0.5, 5, 0)
+                    targetPos = targetPos + Vector3.new(0.5, 0, 0)
                     local matchedGears = getNearbyTargetObjects(gearNames, globalSettings.Range)
 
                     for i = 1, math.min(#matchedGears, 5) do
