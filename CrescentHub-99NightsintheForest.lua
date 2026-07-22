@@ -30,12 +30,13 @@ local autoCookSettings = { Enabled = false, Speed = 2.0, TargetPosition = Vector
 local autoGearsSettings = { 
     Enabled = false, 
     Speed = 0.1, 
-    TargetPosition = Vector3.new(20.9, 6.2, -5.4)
+    TargetPosition = Vector3.new(20.9, 6.2, -5.4),
+    Mode = "Gears"
 }
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
 local killAuraSettings = { Enabled = false, Range = 150, Delay = 0.1 }
-local treeAuraSettings = { Enabled = false, Range = 150 }
+local treeAuraSettings = { Enabled = false, Range = 150 } 
 local autoDaySettings = { Enabled = false, Radius = 100, Height = 100, Speed = 1 }
 local autoDayAngle = 0
 
@@ -335,15 +336,20 @@ task.spawn(function()
         ["Broken Microwave"] = true, ["Washing Machine"] = true, ["Old Car Engine"] = true, ["UFO Scrap"] = true,
         ["UFO Component"] = true, ["UFO Junk"] = true, ["Cultist Gem"] = true, ["Gem of the Forest"] = true
     }
+    local logChairNames = {
+        ["Log"] = true, ["Chair"] = true
+    }
+    
     while true do
         if autoGearsSettings.Enabled then
             local targetPos = autoGearsSettings.TargetPosition
             
             if targetPos then
-                local matchedGears = getNearbyTargetObjects(gearNames, globalSettings.Range)
+                local currentTargets = (autoGearsSettings.Mode == "Log/Chair") and logChairNames or gearNames
+                local matchedObjects = getNearbyTargetObjects(currentTargets, globalSettings.Range)
 
-                for i = 1, math.min(#matchedGears, 5) do
-                    local obj = matchedGears[i]
+                for i = 1, math.min(#matchedObjects, 5) do
+                    local obj = matchedObjects[i]
                     task.spawn(function()
                         if obj:IsA("Model") and obj.PrimaryPart then
                             requestDrag:FireServer(obj)
@@ -572,7 +578,7 @@ MainTab:Slider({ Title = "Kill Aura Delay (Seconds)", Step = 0.05, Value = { Min
 
 MainTab:Section({ Title = "Auto Cut Tree Settings" })
 MainTab:Toggle({ Title = "Enable Auto Cut Tree", Default = false, Callback = function(s) treeAuraSettings.Enabled = s end })
-MainTab:Slider({ Title = "Auto Cut Tree Range (Studs)", Step = 10, Value = { Min = 10, Max = 200, Default = 100 }, Callback = function(v) treeAuraSettings.Range = v end })
+MainTab:Slider({ Title = "Auto Cut Tree Range (Studs)", Step = 10, Value = { Min = 10, Max = 200, Default = 150 }, Callback = function(v) treeAuraSettings.Range = v end })
 
 local AutoTab = Window:Tab({ Title = "Auto", Icon = "refresh-cw" })
 AutoTab:Section({ Title = "Auto Campfire Settings" })
@@ -585,6 +591,7 @@ AutoTab:Slider({ Title = "Cook Feed Delay (Seconds)", Step = 0.05, Value = { Min
 
 AutoTab:Section({ Title = "Auto Farm Workspace Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Farm Workspace", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
+AutoTab:Dropdown({ Title = "Workspace Farm Target", Values = {"Gears", "Log/Chair"}, Value = "Gears", Callback = function(v) autoGearsSettings.Mode = v end })
 AutoTab:Slider({ Title = "Workspace Farm Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 0.1 }, Callback = function(v) autoGearsSettings.Speed = v end })
 
 AutoTab:Section({ Title = "Auto Eat Settings" })
@@ -675,7 +682,7 @@ end
 
 local playerDropdown = TeleportTab:Dropdown({ Title = "Select Player", Values = getPlayerList(), Value = nil, Callback = function(v) selectedPlayerToTP = v end })
 TeleportTab:Button({
-    Title = "Teleport to Selected Player",
+    Title = "Teleport to Selected Options",
     Callback = function()
         if selectedPlayerToTP then
             local targetPlr = Players:FindFirstChild(selectedPlayerToTP)
