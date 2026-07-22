@@ -136,9 +136,9 @@ local function executeBring(targetNames)
                 if not character or not character:FindFirstChild("HumanoidRootPart") then return end
                 targetCFrame = character.HumanoidRootPart.CFrame + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
             elseif globalSettings.BringDestination == "WorkSpace" then
-                targetCFrame = CFrame.new(0.5, 8.4, 0.3) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
-            elseif globalSettings.BringDestination == "Campfire" then
                 targetCFrame = CFrame.new(20.9, 6.2, -5.4) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
+            elseif globalSettings.BringDestination == "Campfire" then
+                targetCFrame = CFrame.new(0.5, 8.4, 0.3) + Vector3.new(math.random(-3, 3), math.random(1, 4), math.random(-3, 3))
             end
 
             if targetCFrame then
