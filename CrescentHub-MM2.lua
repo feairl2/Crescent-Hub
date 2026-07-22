@@ -19,6 +19,7 @@ local Fly_Enabled = false
 local FlySpeed = 30
 local FlyConnection = nil
 local flyVelocity = Vector3.new(0, 0, 0)
+local lockedY = nil
 
 local AutoFarm_Enabled = false
 local FarmSpeed = 30
@@ -561,10 +562,12 @@ PlayerTab:Toggle({
             end
             if hum then hum.PlatformStand = false end
             flyVelocity = Vector3.new(0, 0, 0)
+            lockedY = nil
         else
             if hum and root then
                 hum.PlatformStand = true
                 flyVelocity = Vector3.new(0, 0, 0)
+                lockedY = root.Position.Y
                 
                 if FlyConnection then FlyConnection:Disconnect() end
                 
@@ -583,10 +586,19 @@ PlayerTab:Toggle({
                     if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
                     if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
                     
-                    local targetVel = moveDir.Magnitude > 0 and moveDir.Unit * FlySpeed or Vector3.new(0, 0, 0)
-                    flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
+                    if moveDir.Magnitude > 0 then
+                        lockedY = nil
+                        local targetVel = moveDir.Unit * FlySpeed
+                        flyVelocity = flyVelocity:Lerp(targetVel, math.clamp(dt * 15, 0, 1))
+                        currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
+                    else
+                        flyVelocity = Vector3.new(0, 0, 0)
+                        if not lockedY then
+                            lockedY = currentRoot.Position.Y
+                        end
+                        currentRoot.CFrame = CFrame.new(Vector3.new(currentRoot.Position.X, lockedY, currentRoot.Position.Z), currentRoot.Position + camera.CFrame.LookVector)
+                    end
                     
-                    currentRoot.CFrame = currentRoot.CFrame + (flyVelocity * dt)
                     currentRoot.CFrame = CFrame.new(currentRoot.Position, currentRoot.Position + camera.CFrame.LookVector)
                     
                     currentRoot.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -829,7 +841,7 @@ RunService.Heartbeat:Connect(function()
                 isDodgeActive = true
                 
                 local baseEscapeDir = (root.Position - murdererHRP.Position).Unit
-                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180}
+                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180, 210, -210, 240, -240, 270, -270, 300, -300, 330, -330}
                 local bestTargetPos = nil
                 local maxDistFromMurderer = 0
                 
@@ -841,7 +853,7 @@ RunService.Heartbeat:Connect(function()
                 
                 for _, ang in ipairs(angles) do
                     local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
-                    local candidatePos = root.Position + (rotatedDir * 40)
+                    local candidatePos = root.Position + (rotatedDir * 45)
                     
                     local success = pcall(function()
                         path:ComputeAsync(root.Position, candidatePos)
@@ -865,7 +877,7 @@ RunService.Heartbeat:Connect(function()
                     if bestTargetPos then
                         root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3, 0))
                     else
-                        root.CFrame = root.CFrame + (baseEscapeDir * 30) + Vector3.new(0, 4, 0)
+                        root.CFrame = root.CFrame + (baseEscapeDir * 35) + Vector3.new(0, 4, 0)
                     end
                     
                     task.wait(1.2)
@@ -959,6 +971,7 @@ RunService.Heartbeat:Connect(function()
 end)
 
 Players.PlayerRemoving:Connect(function(p)
+    CurrentESP_Clear = nil
     ClearPlayerESP(p.Name)
 end)
 
