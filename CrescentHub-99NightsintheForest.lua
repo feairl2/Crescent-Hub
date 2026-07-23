@@ -31,7 +31,7 @@ local autoGearsSettings = {
     Enabled = false, 
     Speed = 0.1, 
     TargetPosition = Vector3.new(20.9, 6.2, -5.4),
-    Mode = "Gears"
+    Modes = {["Gears"] = true}
 }
 local autoEatSettings = { Enabled = false, Threshold = 90 }
 local godModeSettings = { Enabled = false, Height = 15 }
@@ -51,7 +51,7 @@ local miscSettings = {
     GlowEnabled = false, GlowBrightness = 10, GlowRange = 20, GlowColor = Color3.fromRGB(255, 255, 255)
 }
 
-local espSettings = { Players = false, Trees = false, Rabbits = false, Categories = {} }
+local espSettings = { Players = false, Trees = false, Bunnies = false, Wolves = false, Bears = false, Chests = false, Categories = {} }
 local activeESP = {}
 
 local function pressE()
@@ -233,10 +233,22 @@ task.spawn(function()
                     shouldShow = true
                     labelName = "Tree"
                     labelColor = Color3.fromRGB(0, 255, 0)
-                elseif espSettings.Rabbits and name == "Bunny" then
+                elseif espSettings.Bunnies and name == "Bunny" then
                     shouldShow = true
-                    labelName = "Rabbit"
+                    labelName = "Bunny"
                     labelColor = Color3.fromRGB(255, 192, 203)
+                elseif espSettings.Wolves and name == "Wolf" then
+                    shouldShow = true
+                    labelName = "Wolf"
+                    labelColor = Color3.fromRGB(128, 128, 128)
+                elseif espSettings.Bears and name == "Bear" then
+                    shouldShow = true
+                    labelName = "Bear"
+                    labelColor = Color3.fromRGB(139, 69, 19)
+                elseif espSettings.Chests and (name == "Item Chest" or name == "Item Chest2" or name == "Item Chest3" or name == "Item Chest4" or name == "Item Chest5" or name == "Item Chest6" or name == "Alien Chest") then
+                    shouldShow = true
+                    labelName = name
+                    labelColor = Color3.fromRGB(255, 215, 0)
                 else
                     for category, names in pairs(espSettings.Categories) do
                         if names[name] then
@@ -345,9 +357,12 @@ task.spawn(function()
             local targetPos = autoGearsSettings.TargetPosition
             
             if targetPos then
-                local currentTargets = gearNames
-                if autoGearsSettings.Mode == "Log/Chair" then
-                    currentTargets = logChairNames
+                local currentTargets = {}
+                if autoGearsSettings.Modes["Gears"] then
+                    for k, v in pairs(gearNames) do currentTargets[k] = v end
+                end
+                if autoGearsSettings.Modes["Log/Chair"] then
+                    for k, v in pairs(logChairNames) do currentTargets[k] = v end
                 end
                 
                 local matchedObjects = getNearbyTargetObjects(currentTargets, globalSettings.Range)
@@ -568,9 +583,6 @@ MainTab:Slider({ Title = "Circle Radius", Step = 10, Value = { Min = 50, Max = 5
 MainTab:Slider({ Title = "Circle Height", Step = 10, Value = { Min = 10, Max = 300, Default = 100 }, Callback = function(v) autoDaySettings.Height = v end })
 MainTab:Slider({ Title = "Circle Speed", Step = 0.1, Value = { Min = 0.1, Max = 5, Default = 1 }, Callback = function(v) autoDaySettings.Speed = v end })
 
-MainTab:Section({ Title = "Pick All Coins" })
-MainTab:Button({ Title = "Pick All Coins", Desc = "Teleport all Coin Stacks to player", Callback = function() pickAllCoins() end })
-
 MainTab:Section({ Title = "God Mode Settings" })
 MainTab:Toggle({ Title = "Enable God Mode (Float)", Default = false, Callback = function(s) godModeSettings.Enabled = s end })
 MainTab:Slider({ Title = "Float Height (Studs)", Step = 1, Value = { Min = 1, Max = 50, Default = 15 }, Callback = function(v) godModeSettings.Height = v end })
@@ -595,7 +607,22 @@ AutoTab:Slider({ Title = "Cook Feed Delay (Seconds)", Step = 0.05, Value = { Min
 
 AutoTab:Section({ Title = "Auto Farm Workspace Settings" })
 AutoTab:Toggle({ Title = "Enable Auto Farm Workspace", Default = false, Callback = function(s) autoGearsSettings.Enabled = s end })
-AutoTab:Dropdown({ Title = "Workspace Farm Target", Values = {"Gears", "Log/Chair"}, Value = "Gears", Callback = function(v) autoGearsSettings.Mode = v end })
+AutoTab:Dropdown({ 
+    Title = "Workspace Farm Target", 
+    Values = {"Gears", "Log/Chair"}, 
+    Multi = true,
+    Value = {"Gears"}, 
+    Callback = function(v) 
+        autoGearsSettings.Modes = {}
+        if type(v) == "table" then
+            for _, mode in ipairs(v) do
+                autoGearsSettings.Modes[mode] = true
+            end
+        else
+            autoGearsSettings.Modes[v] = true
+        end
+    end 
+})
 AutoTab:Slider({ Title = "Workspace Farm Delay (Seconds)", Step = 0.05, Value = { Min = 0.01, Max = 5, Default = 0.1 }, Callback = function(v) autoGearsSettings.Speed = v end })
 
 AutoTab:Section({ Title = "Auto Eat Settings" })
@@ -632,7 +659,12 @@ local ESPTab = Window:Tab({ Title = "ESP", Icon = "eye" })
 ESPTab:Section({ Title = "Entities ESP" })
 ESPTab:Toggle({ Title = "Player ESP", Default = false, Callback = function(s) espSettings.Players = s clearAllESP() end })
 ESPTab:Toggle({ Title = "Tree ESP", Default = false, Callback = function(s) espSettings.Trees = s clearAllESP() end })
-ESPTab:Toggle({ Title = "Rabbit ESP", Default = false, Callback = function(s) espSettings.Rabbits = s clearAllESP() end })
+ESPTab:Toggle({ Title = "Bunny ESP", Default = false, Callback = function(s) espSettings.Bunnies = s clearAllESP() end })
+ESPTab:Toggle({ Title = "Wolf ESP", Default = false, Callback = function(s) espSettings.Wolves = s clearAllESP() end })
+ESPTab:Toggle({ Title = "Bear ESP", Default = false, Callback = function(s) espSettings.Bears = s clearAllESP() end })
+
+ESPTab:Section({ Title = "Chest ESP" })
+ESPTab:Toggle({ Title = "Chest ESP", Default = false, Callback = function(s) espSettings.Chests = s clearAllESP() end })
 
 ESPTab:Section({ Title = "Item Categories ESP" })
 local categoriesData = {
@@ -678,6 +710,56 @@ local TeleportTab = Window:Tab({ Title = "Teleport", Icon = "map-pin" })
 TeleportTab:Section({ Title = "Custom Teleport" })
 TeleportTab:Button({ Title = "Tp to campfire", Callback = function() if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0.9, 13.5, -1.1) end end })
 
+TeleportTab:Section({ Title = "Lost Child Teleport" })
+TeleportTab:Button({
+    Title = "Tween to lost child",
+    Desc = "Carry lost child to campire",
+    Locked = false,
+    Callback = function()
+        local Players = game:GetService("Players")
+        local TweenService = game:GetService("TweenService")
+        
+        local player = Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local root = character:WaitForChild("HumanoidRootPart")
+        local originalCFrame = root.CFrame
+
+        local function findLostChild()
+            local charactersFolder = workspace:WaitForChild("Characters")
+            for _, child in pairs(charactersFolder:GetChildren()) do
+                if child.Name == "Lost Child" then
+                    local hrp = child:FindFirstChild("HumanoidRootPart") or child:FindFirstChildWhichIsA("BasePart")
+                    if hrp then
+                        return hrp
+                    end
+                end
+            end
+            return nil
+        end
+
+        local target = findLostChild()
+
+        if not target then
+            WindUI:Notify({
+                Title = "Error",
+                Content = "CANNOT FIND LOST CHILD, OR YOUR CAMPIRE LEVEL IS LOW",
+                Duration = 3,
+                Icon = "bird",
+            })
+        else
+            local distance = (root.Position - target.Position).Magnitude
+            local tweenInfo = TweenInfo.new(distance / 500, Enum.EasingStyle.Linear)
+            local tweenTo = TweenService:Create(root, tweenInfo, {CFrame = target.CFrame + Vector3.new(0, 3, 0)})
+            tweenTo:Play()
+            tweenTo.Completed:Wait()
+            task.wait(15)
+
+            local tweenBack = TweenService:Create(root, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = originalCFrame})
+            tweenBack:Play()
+        end
+    end
+})
+
 TeleportTab:Section({ Title = "Player Teleport" })
 local selectedPlayerToTP = nil
 local function getPlayerList()
@@ -698,7 +780,7 @@ TeleportTab:Button({
                 end
             end
         end
-    end,
+    end
 })
 Players.PlayerAdded:Connect(function() playerDropdown:SetValues(getPlayerList()) end)
 Players.PlayerRemoving:Connect(function() playerDropdown:SetValues(getPlayerList()) end)
@@ -713,5 +795,8 @@ MiscTab:Section({ Title = "Player Glow Settings" })
 MiscTab:Toggle({ Title = "Enable Player Glow", Default = false, Callback = function(s) miscSettings.GlowEnabled = s if not s and glowPointLight then glowPointLight:Destroy() glowPointLight = nil end end })
 MiscTab:Slider({ Title = "Glow Brightness", Step = 1, Value = { Min = 1, Max = 50, Default = 10 }, Callback = function(v) miscSettings.GlowBrightness = v end })
 MiscTab:Slider({ Title = "Glow Range (Studs)", Step = 5, Value = { Min = 5, Max = 100, Default = 20 }, Callback = function(v) miscSettings.GlowRange = v end })
+
+MiscTab:Section({ Title = "Pick Coins" })
+MiscTab:Button({ Title = "Pick All Coins", Desc = "Teleport all Coin Stacks to player", Callback = function() pickAllCoins() end })
 
 Window:SelectTab(1)
