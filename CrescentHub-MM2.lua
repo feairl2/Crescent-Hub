@@ -189,14 +189,14 @@ FarmTab:Toggle({
     Callback = function(Value) AutoGrabGun_Enabled = Value end
 })
 
-local VisualTab = Window:Tab({
-    Title = "Visual",
-    Icon = "image",
+local VisualESPTab = Window:Tab({
+    Title = "Visual/ESP",
+    Icon = "eye",
 })
 
-VisualTab:Section({ Title = "World Visuals" })
+VisualESPTab:Section({ Title = "World Visuals" })
 
-VisualTab:Toggle({
+VisualESPTab:Toggle({
     Title = "X-Ray (Map Transparency)",
     Desc = "Makes the entire map semi-transparent excluding players.",
     Default = false,
@@ -229,14 +229,9 @@ VisualTab:Toggle({
     end
 })
 
-local ESPTab = Window:Tab({
-    Title = "ESP",
-    Icon = "eye",
-})
+VisualESPTab:Section({ Title = "ESP Settings" })
 
-ESPTab:Section({ Title = "ESP Settings" })
-
-ESPTab:Toggle({
+VisualESPTab:Toggle({
     Title = "Enable Player ESP (Chams)",
     Desc = "Toggle wallhack highlights on players.",
     Default = false,
@@ -248,14 +243,14 @@ ESPTab:Toggle({
     end
 })
 
-ESPTab:Toggle({
+VisualESPTab:Toggle({
     Title = "Show Roles (MM2)",
     Desc = "Color-code roles (Red=Murder, Blue=Sheriff, Green=Innocent).",
     Default = false,
     Callback = function(Value) ESP_ShowRoles = Value end
 })
 
-ESPTab:Toggle({
+VisualESPTab:Toggle({
     Title = "Show Player Names",
     Desc = "Display name tags above players.",
     Default = false,
@@ -265,7 +260,7 @@ ESPTab:Toggle({
     end
 })
 
-ESPTab:Toggle({
+VisualESPTab:Toggle({
     Title = "Show Dropped Gun ESP",
     Desc = "Highlight the dropped sheriff gun on the floor.",
     Default = false,
@@ -839,7 +834,7 @@ RunService.Heartbeat:Connect(function()
             local murdererHRP = murderer.Character.HumanoidRootPart
             local distance = (root.Position - murdererHRP.Position).Magnitude
             
-            if distance <= 50 then
+            if distance <= 45 then
                 isDodgeActive = true
                 
                 local bestTargetPos = nil
