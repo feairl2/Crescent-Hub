@@ -35,6 +35,7 @@ local OriginalTransparency = {}
 local FakeDeath_Enabled = false
 local OriginalCFrame = nil
 local IsFlinging = false
+local RagdollJoints = {}
 
 local Window = WindUI:CreateWindow({
     Title = "Crescent Hub - MM2",
@@ -358,9 +359,49 @@ local TrollTab = Window:Tab({
 
 TrollTab:Section({ Title = "Fake & Prank" })
 
+local function SetRagdoll(char, enable)
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum:ChangeState(enable and Enum.HumanoidStateType.Physics or Enum.HumanoidStateType.GettingUp)
+    end
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("Motor6D") then
+            if enable then
+                if not RagdollJoints[v] then
+                    local socket = Instance.new("BallSocketConstraint")
+                    local a0 = Instance.new("Attachment")
+                    local a1 = Instance.new("Attachment")
+                    a0.CFrame = v.C0
+                    a1.CFrame = v.C1
+                    a0.Parent = v.Part0
+                    a1.Parent = v.Part1
+                    socket.Attachment0 = a0
+                    socket.Attachment1 = a1
+                    socket.Parent = v.Part0
+                    v.Enabled = false
+                    RagdollJoints[v] = {Socket = socket, Att0 = a0, Att1 = a1}
+                end
+            else
+                if RagdollJoints[v] then
+                    pcall(function()
+                        RagdollJoints[v].Socket:Destroy()
+                        RagdollJoints[v].Att0:Destroy()
+                        RagdollJoints[v].Att1:Destroy()
+                    end)
+                    v.Enabled = true
+                end
+            end
+        end
+    end
+    if not enable then
+        table.clear(RagdollJoints)
+    end
+end
+
 TrollTab:Toggle({
     Title = "Fake Death",
-    Desc = "Lies down flat on the ground to fool other players.",
+    Desc = "Ragdolls and lies down flat on the ground to fool other players.",
     Default = false,
     Callback = function(Value)
         FakeDeath_Enabled = Value
@@ -372,12 +413,13 @@ TrollTab:Toggle({
         if Value then
             if root and hum then
                 hum.PlatformStand = true
-                root.CFrame = root.CFrame * CFrame.Angles(math.rad(90), 0, 0)
+                SetRagdoll(char, true)
             end
         else
             if root and hum then
+                SetRagdoll(char, false)
                 hum.PlatformStand = false
-                root.CFrame = root.CFrame * CFrame.Angles(math.rad(-90), 0, 0)
+                hum:ChangeState(Enum.HumanoidStateType.GettingUp)
             end
         end
     end
