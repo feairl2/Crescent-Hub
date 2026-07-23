@@ -93,7 +93,7 @@ CombatTab:Section({ Title = "Murderer Automation" })
 
 CombatTab:Toggle({
     Title = "Auto Kill All (As Murderer)",
-    Desc = "Teleport behind targets, ensure death, and avoid repeats.",
+    Desc = "Teleport behind targets, strike once, and only chase if alive.",
     Default = false,
     Callback = function(Value) KillAll_Enabled = Value end
 })
@@ -822,30 +822,25 @@ task.spawn(function()
                                     
                                     localPlayer_Noclip_Active = true
                                     root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
-                                    task.wait(0.1)
+                                    task.wait(0.05)
                                     
                                     if knife.Parent == lp.Backpack then
                                         hum:EquipTool(knife)
                                     end
+                                    task.wait(0.05)
                                     
-                                    local startTime = tick()
-                                    while KillAll_Enabled and enemy.Parent and enemyHum.Health > 0 and (tick() - startTime < 3) do
-                                        VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                                        task.wait(0.05)
-                                        VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                                        task.wait(0.15)
-                                        
-                                        if enemyRoot and root then
-                                            root.CFrame = enemyRoot.CFrame * CFrame.new(0, 0, 2)
-                                        end
-                                    end
+                                    VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                                    task.wait(0.05)
+                                    VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                                    
+                                    task.wait(0.2)
                                     
                                     if enemyHum.Health <= 0 then
                                         killedTargets[enemy.Name] = true
                                     end
                                     
                                     localPlayer_Noclip_Active = false
-                                    task.wait(0.2)
+                                    task.wait(0.1)
                                 end
                             end
                         end
