@@ -839,13 +839,11 @@ RunService.Heartbeat:Connect(function()
             local murdererHRP = murderer.Character.HumanoidRootPart
             local distance = (root.Position - murdererHRP.Position).Magnitude
             
-            if distance <= 45 then
+            if distance <= 50 then
                 isDodgeActive = true
                 
-                local baseEscapeDir = (root.Position - murdererHRP.Position).Unit
-                local angles = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180}
                 local bestTargetPos = nil
-                local maxDistFromMurderer = 0
+                local maxDistFromMurderer = distance
                 
                 local path = PathfindingService:CreatePath({
                     AgentRadius = 2,
@@ -853,9 +851,13 @@ RunService.Heartbeat:Connect(function()
                     AgentCanJump = true
                 })
                 
+                local checkDistance = 40
+                local angles = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330}
+                
                 for _, ang in ipairs(angles) do
-                    local rotatedDir = CFrame.Angles(0, math.rad(ang), 0) * baseEscapeDir
-                    local candidatePos = root.Position + (rotatedDir * 40)
+                    local rad = math.rad(ang)
+                    local dir = Vector3.new(math.cos(rad), 0, math.sin(rad))
+                    local candidatePos = root.Position + (dir * checkDistance)
                     
                     local success = pcall(function()
                         path:ComputeAsync(root.Position, candidatePos)
@@ -879,7 +881,8 @@ RunService.Heartbeat:Connect(function()
                     if bestTargetPos then
                         root.CFrame = CFrame.new(bestTargetPos + Vector3.new(0, 3, 0))
                     else
-                        root.CFrame = root.CFrame + (baseEscapeDir * 30) + Vector3.new(0, 4, 0)
+                        local fallbackDir = (root.Position - murdererHRP.Position).Unit
+                        root.CFrame = root.CFrame + (fallbackDir * 30) + Vector3.new(0, 4, 0)
                     end
                     
                     task.wait(1.2)
