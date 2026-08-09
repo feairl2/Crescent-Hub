@@ -1,4 +1,4 @@
-local HttpService = game:GetService("HttpService"
+local HttpService = game:GetService("HttpService")
 
 local function sendSignal(signal)
     for port = 27842, 27861 do
